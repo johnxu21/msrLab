@@ -1,7 +1,7 @@
 ## Software Reengineering lab on MSR
 In this repo you will find the course content for lecture Mining Repositories for the course Software Re-engineering at the University of Antwerp, Belgium
 
-**NOTE:** To make a succefull excution, you need to be connected to internet
+**NOTE:** To make a successfull excution, you need to be connected to internet
 ### 1 - Prepare to run the script 
 
 <ul>
@@ -21,7 +21,8 @@ git clone https://github.com/johnxu21/sre2020-21.git
 <li>On line 52 **repo = 'kuyesu/sre'** supply repo as the example below from your github with username and repo</li>
 </ul>
 <ul><li>Edit **lstTokens** with your own generated token, to generate new token, from, go to **settings** and to **developer setting** then on **gerate new token**</li></ul>
-### 2 (Linux) - Running the script on linux
+
+### 2 - Running the script on linux (Linux/Mac)
 
 To run the script on Linux
 
@@ -35,7 +36,7 @@ Now run the script
 ```python
 sudo ./script.sh
 ```
-### 2 (Windows) - Running the script on Windows
+### 2 - Running the script on Windows (Windows) 
 
 All you have to do is just execute the **script.bat** file
 
