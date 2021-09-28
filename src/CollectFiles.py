@@ -49,7 +49,7 @@ def countfiles(dictfiles, lsttokens, repo):
         print("Error receiving data")
         exit(0)
 # GitHub repo
-repo = 'scottyab/rootbeer'
+repo = 'kuyesu/sre'
 # repo = 'Skyscanner/backpack' # This repo is commit heavy. It takes long to finish executing
 # repo = 'k9mail/k-9' # This repo is commit heavy. It takes long to finish executing
 # repo = 'mendhak/gpslogger'
@@ -59,9 +59,11 @@ repo = 'scottyab/rootbeer'
 # Remember to empty the list when going to commit to GitHub.
 # Otherwise they will all be reverted and you will have to re-create them
 # I would advise to create more than one token for repos with heavy commits
-lstTokens = ["fd02a694b606c4120b8ca7bbe7ce29229376ee",
-                "16ce529bdb32263fb90a392d38b5f53c7ecb6b",
-                "8cea5715051869e98044f38b60fe897b350d4a"]
+# lstTokens = ["fd02a694b606c4120b8ca7bbe7ce29229376ee",
+#                 "16ce529bdb32263fb90a392d38b5f53c7ecb6b",
+#                 "8cea5715051869e98044f38b60fe897b350d4a"]
+
+lstTokens = ['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']
 
 dictfiles = dict()
 countfiles(dictfiles, lstTokens, repo)
