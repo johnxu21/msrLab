@@ -18,7 +18,7 @@ git clone https://github.com/johnxu21/sre2020-21.git
 <li>Update the following lnes of codes with your info </li>
 </ul>
 <ul>
-<li>On line 52 **repo = ''** supply repo as the example below from your github with username and repo for example</li>
+<li>On line 52 ** repo = '' ** supply repo as the example below from your github with username and repo for example</li>
 </ul>
 
 ```python
@@ -26,7 +26,7 @@ git clone https://github.com/johnxu21/sre2020-21.git
 repo = 'kuyesu/sre'
 ```
 
-<ul><li>Edit **lstTokens** with your own generated token, to generate new token, from, go to **settings** and to **developer setting** then on **gerate new token**</li></ul>
+<ul><li>Edit **lstTokens** with your own generated token, to generate new token, go to **settings** and to **developer settings** then to **gerate new token**</li></ul>
 
 ```python
 lstTokens = ['<your-token-here>']
@@ -36,7 +36,7 @@ lstTokens = ['<your-token-here>']
 
 To run the script on Linux
 
-First give a execution permission using the command below
+First give execution permission using the command below
 
 ```python
 sudo chmod u+x script.sh
@@ -53,3 +53,4 @@ All you have to do is just execute the **script.bat** file
 ```python
 script.bat
 ```
+
