@@ -5,7 +5,7 @@ In this repo you will find the course content for lecture Mining Repositories fo
 ### 1 - Prepare to run the script 
 
 <ul>
-    <li>Clone the repo in git bash or terminal or cmd</li>
+    <li>Clone the repo (fork) in your working directory</li>
 </ul>
 
 ```python
@@ -14,13 +14,21 @@ git clone https://github.com/johnxu21/sre2020-21.git
 <ul>
 <li>Open it in your favourite editor</li>
 
-<li>In the directory <span style="weight: 800">src</span> you find a script <span>CollectFiles.py</span> </li>
-<li>Update the script as below with your info </li>
+<li>In the directory <span style="weight: 800">src,</span> you find a script <span>CollectFiles.py</span> </li>
+<li>Update the following lnes of codes with your info </li>
 </ul>
 <ul>
-<li>On line 52 **repo = 'kuyesu/sre'** supply repo as the example below from your github with username and repo</li>
+<li>On line 52 **repo = ''** supply repo as the example below from your github with username and repo for example</li>
 </ul>
+```python
+# GitHub repo
+repo = 'kuyesu/sre'
+```
+
 <ul><li>Edit **lstTokens** with your own generated token, to generate new token, from, go to **settings** and to **developer setting** then on **gerate new token**</li></ul>
+```python
+lstTokens = ['<your-token-here>']
+```
 
 ### 2 - Running the script on linux (Linux/Mac)
 
