@@ -20,12 +20,14 @@ git clone https://github.com/johnxu21/sre2020-21.git
 <ul>
 <li>On line 52 **repo = ''** supply repo as the example below from your github with username and repo for example</li>
 </ul>
+
 ```python
 # GitHub repo
 repo = 'kuyesu/sre'
 ```
 
 <ul><li>Edit **lstTokens** with your own generated token, to generate new token, from, go to **settings** and to **developer setting** then on **gerate new token**</li></ul>
+
 ```python
 lstTokens = ['<your-token-here>']
 ```
