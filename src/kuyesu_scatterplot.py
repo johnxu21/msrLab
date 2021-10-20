@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import random
 
-filename = "../data/file_rootbeer.csv"
+filename ="data/file_rootbeer.csv"
 
 files = []
 authors = []
