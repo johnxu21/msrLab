@@ -1,12 +1,12 @@
 import requests
 import json
 
-url = "https://api.github.com/kuyesu/repos"
-token = "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"
+url = 'https://api.github.com/user/repos'
+token = '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'
 
-headers = {"Authorization" : "token {}".format(token)}
-RespositoryName = input("Enter the repo: ")
+headers = {'Authorization' : 'token {}'.format(token)}
+ResporitoryName = input("Enter repo: ")
 
-data = {"data" : "{}".format(RespositoryName)}
+data = {'name' : '{}'.format(ResporitoryName)}
 
-requests.post(url, data = json.dumps(data), headers=headers)
+print(requests.post(url, data=json.dumps(data), headers=headers))
