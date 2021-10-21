@@ -89,7 +89,7 @@ def countfiles( lsttokens, repo, filenames, names, dates):
 
 repo = 'kuyesu/rootbeer'
 # put your tokens here
-lstTokens = ['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']
+lstTokens = ['']
 
 names = []
 dates = []

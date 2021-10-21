@@ -3,7 +3,7 @@ import json
 
 
 
-token = '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'
+token = ''
 
 headers = {'Authorization' : 'token {}'.format(token)}
 
