@@ -21,7 +21,7 @@ def github_auth(url, lsttoken, ct):
 # @dictFiles, empty dictionary of files
 # @lstTokens, GitHub authentication tokens
 # @repo, GitHub repo
-def countfiles(dictfiles, lsttokens, repo):
+def countfiles(dictfiles, lsttokens, repo, authors, commDates):
     ipage = 1  # url page counter
     ct = 0  # token counter
 
@@ -41,14 +41,24 @@ def countfiles(dictfiles, lsttokens, repo):
                 # For each commit, use the GitHub commit API to extract the files touched by the commit
                 shaUrl = 'https://api.github.com/repos/' + repo + '/commits/' + sha
                 shaDetails, ct = github_auth(shaUrl, lsttokens, ct)
+
                 filesjson = shaDetails['files']
 
-                print(shaUrl)
+                # print(shaUrl)
 
                 for filenameObj in filesjson:
                     filename = filenameObj['filename']
-                    dictfiles[filename] = dictfiles.get(filename, 0) + 1
-                    print(filename)
+
+                    if filename.endswith('.java'):
+                        author = shaDetails['commit']['author']['name']
+                        commDate = shaDetails['commit']['author']['date']
+
+                        dictfiles[filename] = dictfiles.get(filename, 0) + 1
+                        authors.append(author)
+                        commDates.append(commDate)
+
+                        print(filename + " - " + author + " - " + commDate)
+
             ipage += 1
     except:
         print("Error receiving data")
@@ -56,6 +66,7 @@ def countfiles(dictfiles, lsttokens, repo):
 
 
 # GitHub repo
+# repo = 'johnxu21/sre2020-21'
 repo = 'scottyab/rootbeer'
 # repo = 'Skyscanner/backpack'  # This repo is commit heavy. It takes long to finish executing
 # repo = 'k9mail/k-9' # This repo is commit heavy. It takes long to finish executing
@@ -69,21 +80,27 @@ repo = 'scottyab/rootbeer'
 lstTokens = ["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", "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"]
 
 dictfiles = dict()
-countfiles(dictfiles, lstTokens, repo)
+authors = []
+commDates = []
+counter = 0
+countfiles(dictfiles, lstTokens, repo, authors, commDates)
+
 print('Total number of files: ' + str(len(dictfiles)))
 
 file = repo.split('/')[1]
+
 # change this to the path of your file
 fileOutput = 'data/file_' + file + '.csv'
-rows = ["Filename", "Touches"]
+rows = ["Filename", "Author", "Touches", "Date"]
 fileCSV = open(fileOutput, 'w')
 writer = csv.writer(fileCSV)
 writer.writerow(rows)
 
 bigcount = None
 bigfilename = None
+
 for filename, count in dictfiles.items():
-    rows = [filename, count]
+    rows = [filename, count, authors[counter], commDates[counter]]
     writer.writerow(rows)
     if bigcount is None or count > bigcount:
         bigcount = count
