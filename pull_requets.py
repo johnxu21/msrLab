@@ -1,6 +1,6 @@
 import requests
 import pandas as pd
-# from matplotlib import pyplot as plt
+from matplotlib import pyplot as plt
 
 base_url = 'https://api.github.com/repos/{}/pulls?state=all'
 repos = ['scotyab/rootbeer', 'Skyscanner/backpack', 'k9mail/k-9', 'mendhak/gpslogger', 'PeterlJia/android_xlight']
@@ -45,5 +45,15 @@ def get_pull_requests(repos):
 
     merged_data_frame = dataframe[dataframe['merged_at'].notnull()]
     closed_data_frame = dataframe[dataframe['closed_at'].notnull() & dataframe['merged_at'].isnull()]
-    
-    
+    merged_data_frame.to_csv(r''+"merged_pull_request.csv")
+    closed_data_frame.to_csv(r''+"closed_pull_request.csv")
+    fig, ax = plt.subplots()
+    ax.plot(merged_data_frame['created_at'],merged_data_frame['merged_at'],label='Meged')
+    ax.plot(closed_data_frame['created_at'],closed_data_frame['closed_at'],label='Closed')
+    ax.set_xlabel('Date created')
+    ax.set_xlabel('Closed')
+    ax.set_title('Pull Request Graph')
+    ax.legend()
+    plt.show()
+      
+get_pull_requests(repos)      
