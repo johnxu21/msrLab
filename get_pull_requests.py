@@ -8,7 +8,7 @@ compares merged pull requests and closed (but not merged).
 import requests
 import pandas as pd
 from matplotlib import pyplot as plt
-
+# 
 token = "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"
 user_account = "jose-rodrigo-santos"
 headers = {

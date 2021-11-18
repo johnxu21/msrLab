@@ -6,11 +6,12 @@ from django.urls import path, include
 from django.contrib import admin
 from django.urls import path, include
 
-from github.views import CollectFilesView, Get_Pull_Requests
+from github.views import get_context_data
 
 urlpatterns = [
     # path('', CollectFilesView.as_view(), name='collect_files'),
-    path('', Get_Pull_Requests.as_view(), name='get_pull_requests'),
+    # path('', , name='get_pull_requests'),
+    path('', get_context_data, name='get_pull_requests'),
 ]
 
 # get_pull_requests/
