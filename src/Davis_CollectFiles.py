@@ -2,6 +2,7 @@ import json
 import requests
 import csv
 
+
 # GitHub Authentication function
 def github_auth(url, lsttoken, ct):
     jsonData = None
@@ -15,6 +16,7 @@ def github_auth(url, lsttoken, ct):
         pass
         print(e)
     return jsonData, ct
+
 
 # @dictFiles, empty dictionary of files
 # @lstTokens, GitHub authentication tokens
@@ -40,6 +42,9 @@ def countfiles(dictfiles, lsttokens, repo):
                 shaUrl = 'https://api.github.com/repos/' + repo + '/commits/' + sha
                 shaDetails, ct = github_auth(shaUrl, lsttokens, ct)
                 filesjson = shaDetails['files']
+
+                print(shaUrl)
+
                 for filenameObj in filesjson:
                     filename = filenameObj['filename']
                     dictfiles[filename] = dictfiles.get(filename, 0) + 1
@@ -48,9 +53,11 @@ def countfiles(dictfiles, lsttokens, repo):
     except:
         print("Error receiving data")
         exit(0)
+
+
 # GitHub repo
 repo = 'scottyab/rootbeer'
-# repo = 'Skyscanner/backpack' # This repo is commit heavy. It takes long to finish executing
+# repo = 'Skyscanner/backpack'  # This repo is commit heavy. It takes long to finish executing
 # repo = 'k9mail/k-9' # This repo is commit heavy. It takes long to finish executing
 # repo = 'mendhak/gpslogger'
 
@@ -59,9 +66,7 @@ repo = 'scottyab/rootbeer'
 # Remember to empty the list when going to commit to GitHub.
 # Otherwise they will all be reverted and you will have to re-create them
 # I would advise to create more than one token for repos with heavy commits
-lstTokens = ["fd02a694b606c4120b8ca7bbe7ce29229376ee",
-                "16ce529bdb32263fb90a392d38b5f53c7ecb6b",
-                "8cea5715051869e98044f38b60fe897b350d4a"]
+lstTokens = ["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", "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"]
 
 dictfiles = dict()
 countfiles(dictfiles, lstTokens, repo)
