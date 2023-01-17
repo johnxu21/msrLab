@@ -2,6 +2,11 @@ import json
 import requests
 import csv
 
+import os
+
+if not os.path.exists("data"):
+ os.makedirs("data")
+
 # GitHub Authentication function
 def github_auth(url, lsttoken, ct):
     jsonData = None
