@@ -1,0 +1,365 @@
+file,author,date
+app/build.gradle.kts,Niall Scott,Fri Oct 4 08:42:57 2024 +0100
+app/build.gradle.kts,Scott Alexander-Bown,Wed Sep 18 11:02:36 2024 +0100
+app/build.gradle.kts,Scott Alexander-Bown,Thu Sep 12 11:16:21 2024 +0100
+app/build.gradle.kts,Artsem Kurantsou,Sat Aug 17 15:34:47 2024 +0100
+app/build.gradle.kts,Artsem Kurantsou,Mon Aug 5 19:31:03 2024 +0100
+app/build.gradle.kts,Artsem Kurantsou,Sun Aug 4 22:18:36 2024 +0100
+build.gradle.kts,Niall Scott,Fri Oct 4 08:42:57 2024 +0100
+build.gradle.kts,Artsem Kurantsou,Sat Aug 17 15:34:47 2024 +0100
+build.gradle.kts,Artsem Kurantsou,Sun Aug 4 22:18:36 2024 +0100
+gradle.properties,Niall Scott,Fri Oct 4 08:42:57 2024 +0100
+gradle.properties,Scott Alexander-Bown,Wed Sep 18 11:02:36 2024 +0100
+gradle.properties,Scott Alexander-Bown,Thu Sep 12 11:16:21 2024 +0100
+gradle.properties,Scott Alexander-Bown,Fri May 21 15:40:38 2021 +0100
+gradle.properties,Scott Alexander-Bown,Tue May 4 07:47:42 2021 +0100
+gradle.properties,Matthew Rollings,Sat Feb 8 20:34:17 2020 +0000
+gradle.properties,Daniel Kutik,Sat Nov 16 10:34:24 2019 +0800
+gradle.properties,Scott Alexander-Bown,Thu Jun 14 17:02:26 2018 +0100
+gradle.properties,Frieder Bluemle,Fri May 12 00:31:26 2017 +0800
+gradle.properties,Scott Alexander-Bown,Wed Mar 29 12:25:16 2017 +0100
+gradle.properties,Scott Alexander-Bown,Wed May 18 09:05:58 2016 +0100
+gradle.properties,Scott Alexander-Bown,Mon Mar 14 21:04:13 2016 +0000
+gradle.properties,Scott Alexander-Bown,Wed Sep 16 13:13:36 2015 +0100
+gradle.properties,Scott Alexander-Bown,Tue Jun 30 16:51:16 2015 +0100
+gradle.properties,Scott Alexander-Bown,Fri Jun 19 10:05:10 2015 +0100
+gradle/libs.versions.toml,Niall Scott,Fri Oct 4 08:42:57 2024 +0100
+gradle/libs.versions.toml,Scott Alexander-Bown,Thu Sep 12 11:16:21 2024 +0100
+gradle/libs.versions.toml,Artsem Kurantsou,Sun Aug 4 22:38:30 2024 +0100
+gradle/libs.versions.toml,Artsem Kurantsou,Sun Aug 4 22:18:36 2024 +0100
+gradle/wrapper/gradle-wrapper.properties,Niall Scott,Fri Oct 4 08:42:57 2024 +0100
+gradle/wrapper/gradle-wrapper.properties,Artsem Kurantsou,Sun Aug 4 22:38:30 2024 +0100
+gradle/wrapper/gradle-wrapper.properties,Artsem Kurantsou,Sun Aug 4 20:40:34 2024 +0100
+gradle/wrapper/gradle-wrapper.properties,Scott Alexander-Bown,Sat May 8 15:18:37 2021 +0100
+gradle/wrapper/gradle-wrapper.properties,mat,Tue Jan 28 12:31:03 2020 +0000
+gradle/wrapper/gradle-wrapper.properties,Daniel Kutik,Sat Nov 16 10:34:24 2019 +0800
+gradle/wrapper/gradle-wrapper.properties,Matthew Rollings,Fri May 11 13:00:38 2018 +0100
+gradle/wrapper/gradle-wrapper.properties,Matthew Rollings,Fri May 11 13:00:38 2018 +0100
+gradle/wrapper/gradle-wrapper.properties,Frieder Bluemle,Fri May 12 00:31:26 2017 +0800
+gradle/wrapper/gradle-wrapper.properties,Scott Alexander-Bown,Fri Mar 24 14:15:39 2017 +0000
+gradle/wrapper/gradle-wrapper.properties,matthew,Mon Mar 13 22:35:27 2017 +0000
+gradle/wrapper/gradle-wrapper.properties,Scott Alexander-Bown,Tue May 17 16:21:28 2016 +0100
+gradle/wrapper/gradle-wrapper.properties,Scott Alexander-Bown,Fri Jun 19 10:05:10 2015 +0100
+rootbeerlib/build.gradle.kts,Niall Scott,Fri Oct 4 08:42:57 2024 +0100
+rootbeerlib/build.gradle.kts,Scott Alexander-Bown,Wed Sep 18 11:02:36 2024 +0100
+rootbeerlib/build.gradle.kts,Scott Alexander-Bown,Thu Sep 12 11:16:21 2024 +0100
+rootbeerlib/build.gradle.kts,Artsem Kurantsou,Mon Aug 5 20:48:03 2024 +0100
+rootbeerlib/build.gradle.kts,Artsem Kurantsou,Mon Aug 5 20:38:36 2024 +0100
+rootbeerlib/build.gradle.kts,Artsem Kurantsou,Sun Aug 4 22:18:36 2024 +0100
+settings.gradle.kts,Niall Scott,Fri Oct 4 08:42:57 2024 +0100
+settings.gradle.kts,Scott Alexander-Bown,Wed Sep 18 11:02:36 2024 +0100
+settings.gradle.kts,Artsem Kurantsou,Mon Aug 5 19:31:03 2024 +0100
+settings.gradle.kts,Artsem Kurantsou,Sun Aug 4 22:18:36 2024 +0100
+rootbeerlib/gradle.properties,Scott Alexander-Bown,Wed Sep 18 11:02:36 2024 +0100
+rootbeerlib/gradle.properties,Frieder Bluemle,Fri May 12 00:41:00 2017 +0800
+rootbeerlib/gradle.properties,Scott Alexander-Bown,Tue Jun 30 16:51:16 2015 +0100
+README.md,Scott Alexander-Bown,Thu Sep 12 11:18:34 2024 +0100
+README.md,Scott Alexander-Bown,Thu Sep 12 11:16:21 2024 +0100
+README.md,Scott Alexander-Bown,Mon Jun 7 09:54:51 2021 +0100
+README.md,Harsh Mahajan,Mon Jun 7 16:50:08 2021 +0800
+README.md,Scott Alexander-Bown,Tue May 4 08:04:38 2021 +0100
+README.md,Prempal Singh,Tue Jul 28 00:20:09 2020 +0530
+README.md,Matthew Rollings,Tue Jul 21 14:58:39 2020 +0100
+README.md,mat,Tue Feb 4 13:41:34 2020 +0000
+README.md,mat,Tue Jan 28 13:12:19 2020 +0000
+README.md,mat,Tue Jan 28 13:03:18 2020 +0000
+README.md,mat,Tue Jan 28 12:51:22 2020 +0000
+README.md,zhqcqupt,Sat Nov 30 01:15:51 2019 +0800
+README.md,Jamie Cruwys,Thu May 2 16:28:11 2019 +0100
+README.md,Shanmugasanthosh,Sun Nov 4 10:33:57 2018 +0530
+README.md,Matthew Rollings,Mon Jun 25 09:00:15 2018 +0100
+README.md,Frieder Bluemle,Fri May 12 00:41:00 2017 +0800
+README.md,Scott Alexander-Bown,Wed Mar 29 12:25:16 2017 +0100
+README.md,Matthew Rollings,Wed Mar 29 12:18:37 2017 +0100
+README.md,Matthew Rollings,Fri Mar 24 16:11:58 2017 +0000
+README.md,Scott Alexander-Bown,Fri Jul 1 21:21:13 2016 +0100
+README.md,Scott Alexander-Bown,Wed May 18 09:05:58 2016 +0100
+README.md,Scott Alexander-Bown,Mon Mar 14 21:04:13 2016 +0000
+README.md,Litrik De Roy,Wed Jan 6 10:29:30 2016 +0100
+README.md,Scott Alexander-Bown,Thu Sep 17 13:49:01 2015 +0100
+README.md,Scott Alexander-Bown,Thu Sep 17 13:48:32 2015 +0100
+README.md,Scott Alexander-Bown,Wed Jul 1 09:28:32 2015 +0100
+README.md,Scott Alexander-Bown,Tue Jun 30 17:35:59 2015 +0100
+README.md,Scott Alexander-Bown,Tue Jun 30 16:31:31 2015 +0100
+README.md,Matthew Rollings,Tue Jun 30 16:07:09 2015 +0100
+README.md,Matthew Rollings,Tue Jun 30 16:04:49 2015 +0100
+README.md,Scott Alexander-Bown,Tue Jun 30 15:59:24 2015 +0100
+README.md,Scott Alexander-Bown,Tue Jun 30 15:45:12 2015 +0100
+README.md,Scott Alexander-Bown,Tue Jun 30 15:14:08 2015 +0100
+README.md,Scott Alexander-Bown,Mon Jun 29 14:06:14 2015 +0100
+README.md,Scott Alexander-Bown,Fri Jun 26 19:49:17 2015 +0100
+README.md,Scott Alexander-Bown,Fri Jun 19 10:01:56 2015 +0100
+.circleci/config.yml,Scott Alexander-Bown,Thu Sep 12 11:16:21 2024 +0100
+.circleci/config.yml,Scott Alexander-Bown,Sat May 8 15:18:37 2021 +0100
+.circleci/config.yml,mat,Tue Feb 4 13:21:36 2020 +0000
+.circleci/config.yml,Matthew Rollings,Fri May 11 17:10:49 2018 +0100
+.circleci/config.yml,Matthew Rollings,Fri May 11 14:31:48 2018 +0100
+.circleci/config.yml,Matthew Rollings,Fri May 11 14:27:52 2018 +0100
+.github/ISSUE_TEMPLATE.md,Scott Alexander-Bown,Thu Sep 12 11:16:21 2024 +0100
+.github/PULL_REQUEST_TEMPLATE.md,Scott Alexander-Bown,Thu Sep 12 11:16:21 2024 +0100
+CHANGE_LOG.md,Scott Alexander-Bown,Thu Sep 12 11:16:21 2024 +0100
+CHANGE_LOG.md,Scott Alexander-Bown,Sat May 22 14:42:21 2021 +0100
+CHANGE_LOG.md,Scott Alexander-Bown,Sat May 8 15:18:37 2021 +0100
+CHANGE_LOG.md,Scott Alexander-Bown,Tue May 4 07:47:42 2021 +0100
+CHANGE_LOG.md,mat,Tue Feb 4 11:42:07 2020 +0000
+CHANGE_LOG.md,Frieder Bluemle,Fri May 12 00:41:00 2017 +0800
+CHANGE_LOG.md,Scott Alexander-Bown,Wed Mar 29 12:25:16 2017 +0100
+app/src/main/AndroidManifest.xml,Scott Alexander-Bown,Thu Sep 12 11:16:21 2024 +0100
+app/src/main/AndroidManifest.xml,Artsem Kurantsou,Sun Aug 4 20:40:34 2024 +0100
+app/src/main/AndroidManifest.xml,Scott Alexander-Bown,Sat May 8 15:18:37 2021 +0100
+app/src/main/AndroidManifest.xml,Deepak PK,Wed Mar 11 14:58:40 2020 +0530
+app/src/main/AndroidManifest.xml,Daniel Kutik,Sat Nov 16 10:34:24 2019 +0800
+app/src/main/AndroidManifest.xml,Scott Alexander-Bown,Fri Jul 1 21:14:26 2016 +0100
+app/src/main/AndroidManifest.xml,Andy Barber,Fri Jul 1 15:40:45 2016 +0100
+app/src/main/AndroidManifest.xml,Alessandro Yuichi Okimoto,Thu Oct 1 21:26:13 2015 +0900
+app/src/main/AndroidManifest.xml,Scott Alexander-Bown,Fri Jun 26 16:50:40 2015 +0100
+app/src/main/AndroidManifest.xml,Scott Alexander-Bown,Fri Jun 19 10:05:10 2015 +0100
+app/src/main/java/com/scottyab/rootbeer/sample/CheckForRootWorker.kt,Scott Alexander-Bown,Thu Sep 12 11:16:21 2024 +0100
+app/src/main/java/com/scottyab/rootbeer/sample/CheckForRootWorker.kt,grubeli,Tue Nov 16 14:04:57 2021 +0000
+app/src/main/java/com/scottyab/rootbeer/sample/CheckForRootWorker.kt,Scott Alexander-Bown,Mon May 24 08:46:20 2021 +0100
+app/src/main/java/com/scottyab/rootbeer/sample/CheckForRootWorker.kt,Scott Alexander-Bown,Mon May 24 08:45:07 2021 +0100
+app/src/main/java/com/scottyab/rootbeer/sample/CheckForRootWorker.kt,Scott Alexander-Bown,Fri May 21 15:40:38 2021 +0100
+app/src/main/java/com/scottyab/rootbeer/sample/CheckForRootWorker.kt,Scott Alexander-Bown,Sat May 8 15:18:37 2021 +0100
+app/src/main/java/com/scottyab/rootbeer/sample/MainActivity.kt,Scott Alexander-Bown,Thu Sep 12 11:16:21 2024 +0100
+app/src/main/java/com/scottyab/rootbeer/sample/MainActivity.kt,Artsem Kurantsou,Mon Aug 5 19:31:03 2024 +0100
+app/src/main/java/com/scottyab/rootbeer/sample/MainActivity.kt,Artsem Kurantsou,Sun Aug 4 20:40:34 2024 +0100
+app/src/main/java/com/scottyab/rootbeer/sample/MainActivity.kt,Scott Alexander-Bown,Sat May 8 15:18:37 2021 +0100
+app/src/main/java/com/scottyab/rootbeer/sample/RootItemResult.kt,Scott Alexander-Bown,Thu Sep 12 11:16:21 2024 +0100
+app/src/main/java/com/scottyab/rootbeer/sample/RootItemResult.kt,Scott Alexander-Bown,Sat May 8 15:18:37 2021 +0100
+app/src/main/java/com/scottyab/rootbeer/sample/RootSampleApp.kt,Scott Alexander-Bown,Thu Sep 12 11:16:21 2024 +0100
+app/src/main/java/com/scottyab/rootbeer/sample/RootSampleApp.kt,Artsem Kurantsou,Sun Aug 4 20:40:34 2024 +0100
+app/src/main/java/com/scottyab/rootbeer/sample/RootSampleApp.kt,Scott Alexander-Bown,Sat May 8 15:18:37 2021 +0100
+app/src/main/java/com/scottyab/rootbeer/sample/extensions/ViewExtensions.kt,Scott Alexander-Bown,Thu Sep 12 11:16:21 2024 +0100
+app/src/main/java/com/scottyab/rootbeer/sample/extensions/ViewExtensions.kt,Scott Alexander-Bown,Sat May 8 15:18:37 2021 +0100
+app/src/main/java/com/scottyab/rootbeer/sample/ui/ResultIconView.kt,Scott Alexander-Bown,Thu Sep 12 11:16:21 2024 +0100
+app/src/main/java/com/scottyab/rootbeer/sample/ui/ResultIconView.kt,Scott Alexander-Bown,Sat May 8 15:18:37 2021 +0100
+app/src/main/java/com/scottyab/rootbeer/sample/ui/RootItemAdapter.kt,Scott Alexander-Bown,Thu Sep 12 11:16:21 2024 +0100
+app/src/main/java/com/scottyab/rootbeer/sample/ui/RootItemAdapter.kt,Artsem Kurantsou,Sun Aug 4 20:40:34 2024 +0100
+app/src/main/java/com/scottyab/rootbeer/sample/ui/RootItemAdapter.kt,Scott Alexander-Bown,Sat May 8 15:18:37 2021 +0100
+app/src/main/java/com/scottyab/rootbeer/sample/ui/RootedResultTextView.kt,Scott Alexander-Bown,Thu Sep 12 11:16:21 2024 +0100
+app/src/main/java/com/scottyab/rootbeer/sample/ui/RootedResultTextView.kt,Scott Alexander-Bown,Sat May 8 15:18:37 2021 +0100
+app/src/main/java/com/scottyab/rootbeer/sample/ui/ScopedActivity.kt,Scott Alexander-Bown,Thu Sep 12 11:16:21 2024 +0100
+app/src/main/java/com/scottyab/rootbeer/sample/ui/ScopedActivity.kt,Scott Alexander-Bown,Sat May 8 15:18:37 2021 +0100
+app/src/main/res/drawable/ic_check_circle_green_24dp.xml,Scott Alexander-Bown,Thu Sep 12 11:16:21 2024 +0100
+app/src/main/res/drawable/ic_check_circle_green_24dp.xml,Scott Alexander-Bown,Sat May 8 15:18:37 2021 +0100
+app/src/main/res/drawable/ic_error_circle_outline_red_24dp.xml,Scott Alexander-Bown,Thu Sep 12 11:16:21 2024 +0100
+app/src/main/res/drawable/ic_error_circle_outline_red_24dp.xml,Scott Alexander-Bown,Sat May 8 15:18:37 2021 +0100
+app/src/main/res/drawable/ic_info_outline_white_24dp.xml,Scott Alexander-Bown,Thu Sep 12 11:16:21 2024 +0100
+app/src/main/res/drawable/ic_info_outline_white_24dp.xml,Scott Alexander-Bown,Sat May 8 15:18:37 2021 +0100
+app/src/main/res/drawable/ic_lock_open_white_24dp.xml,Scott Alexander-Bown,Thu Sep 12 11:16:21 2024 +0100
+app/src/main/res/drawable/ic_lock_open_white_24dp.xml,Scott Alexander-Bown,Sat May 8 15:18:37 2021 +0100
+app/src/main/res/layout/activity_main.xml,Scott Alexander-Bown,Thu Sep 12 11:16:21 2024 +0100
+app/src/main/res/layout/activity_main.xml,Scott Alexander-Bown,Sat May 8 15:18:37 2021 +0100
+app/src/main/res/layout/activity_main.xml,Deepak PK,Wed Mar 11 14:58:40 2020 +0530
+app/src/main/res/layout/activity_main.xml,Daniel Kutik,Sat Nov 16 10:39:54 2019 +0800
+app/src/main/res/layout/activity_main.xml,Daniel Kutik,Sat Nov 16 10:34:24 2019 +0800
+app/src/main/res/layout/activity_main.xml,Frieder Bluemle,Fri May 12 00:41:00 2017 +0800
+app/src/main/res/layout/activity_main.xml,Matthew Rollings,Fri Mar 24 13:41:16 2017 +0000
+app/src/main/res/layout/activity_main.xml,Andy Barber,Fri Jul 1 15:40:45 2016 +0100
+app/src/main/res/layout/activity_main.xml,Scott Alexander-Bown,Wed Sep 16 13:14:10 2015 +0100
+app/src/main/res/layout/activity_main.xml,Scott Alexander-Bown,Tue Jun 30 15:59:24 2015 +0100
+app/src/main/res/layout/activity_main.xml,Scott Alexander-Bown,Mon Jun 29 14:06:14 2015 +0100
+app/src/main/res/layout/activity_main.xml,Scott Alexander-Bown,Fri Jun 19 10:05:10 2015 +0100
+app/src/main/res/layout/item_root_check.xml,Scott Alexander-Bown,Thu Sep 12 11:16:21 2024 +0100
+app/src/main/res/layout/item_root_check.xml,Scott Alexander-Bown,Sat May 8 15:18:37 2021 +0100
+app/src/main/res/menu/menu_main.xml,Scott Alexander-Bown,Thu Sep 12 11:16:21 2024 +0100
+app/src/main/res/menu/menu_main.xml,Scott Alexander-Bown,Sat May 8 15:18:37 2021 +0100
+app/src/main/res/menu/menu_main.xml,Andy Barber,Fri Jul 1 15:40:45 2016 +0100
+app/src/main/res/menu/menu_main.xml,Scott Alexander-Bown,Mon Jun 29 14:06:14 2015 +0100
+app/src/main/res/menu/menu_main.xml,Scott Alexander-Bown,Fri Jun 19 10:05:10 2015 +0100
+app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml,Scott Alexander-Bown,Thu Sep 12 11:16:21 2024 +0100
+app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml,Scott Alexander-Bown,Sat May 8 17:42:23 2021 +0100
+app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml,Scott Alexander-Bown,Thu Sep 12 11:16:21 2024 +0100
+app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml,Scott Alexander-Bown,Sat May 8 17:42:23 2021 +0100
+app/src/main/res/values/colors.xml,Scott Alexander-Bown,Thu Sep 12 11:16:21 2024 +0100
+app/src/main/res/values/colors.xml,Scott Alexander-Bown,Fri Jul 1 15:26:07 2016 +0100
+app/src/main/res/values/colors.xml,Andy Barber,Fri Jul 1 15:40:45 2016 +0100
+app/src/main/res/values/colors.xml,Scott Alexander-Bown,Wed Sep 16 13:14:10 2015 +0100
+app/src/main/res/values/dimens.xml,Scott Alexander-Bown,Thu Sep 12 11:16:21 2024 +0100
+app/src/main/res/values/dimens.xml,Scott Alexander-Bown,Sat May 8 15:18:37 2021 +0100
+app/src/main/res/values/dimens.xml,Andy Barber,Fri Jul 1 15:40:45 2016 +0100
+app/src/main/res/values/dimens.xml,Scott Alexander-Bown,Fri Jun 19 10:05:10 2015 +0100
+app/src/main/res/values/strings.xml,Scott Alexander-Bown,Thu Sep 12 11:16:21 2024 +0100
+app/src/main/res/values/strings.xml,Scott Alexander-Bown,Sat May 8 15:18:37 2021 +0100
+app/src/main/res/values/strings.xml,Frieder Bluemle,Fri May 12 00:41:00 2017 +0800
+app/src/main/res/values/strings.xml,Andy Barber,Fri Jul 1 15:40:45 2016 +0100
+app/src/main/res/values/strings.xml,Scott Alexander-Bown,Mon Jun 29 14:06:14 2015 +0100
+app/src/main/res/values/strings.xml,Scott Alexander-Bown,Fri Jun 26 16:50:40 2015 +0100
+app/src/main/res/values/strings.xml,Scott Alexander-Bown,Fri Jun 19 10:05:10 2015 +0100
+app/src/main/res/values/styles.xml,Scott Alexander-Bown,Thu Sep 12 11:16:21 2024 +0100
+app/src/main/res/values/styles.xml,Daniel Kutik,Sat Nov 16 10:34:24 2019 +0800
+app/src/main/res/values/styles.xml,Andy Barber,Fri Jul 1 15:40:45 2016 +0100
+app/src/main/res/values/styles.xml,Scott Alexander-Bown,Fri Jun 19 10:05:10 2015 +0100
+rootbeerlib/src/main/cpp/CMakeLists.txt,Scott Alexander-Bown,Thu Sep 12 11:16:21 2024 +0100
+rootbeerlib/src/main/cpp/CMakeLists.txt,Scott Alexander-Bown,Sat May 22 14:42:21 2021 +0100
+gradle/wrapper/gradle-wrapper.jar,Artsem Kurantsou,Sun Aug 4 22:38:30 2024 +0100
+gradle/wrapper/gradle-wrapper.jar,Daniel Kutik,Sat Nov 16 10:34:24 2019 +0800
+gradle/wrapper/gradle-wrapper.jar,Frieder Bluemle,Fri May 12 00:31:26 2017 +0800
+gradle/wrapper/gradle-wrapper.jar,Scott Alexander-Bown,Fri Jun 19 10:05:10 2015 +0100
+gradlew,Artsem Kurantsou,Sun Aug 4 22:38:30 2024 +0100
+gradlew,Frieder Bluemle,Fri May 12 00:31:26 2017 +0800
+gradlew,Scott Alexander-Bown,Fri Jun 19 10:05:10 2015 +0100
+gradlew.bat,Artsem Kurantsou,Sun Aug 4 22:38:30 2024 +0100
+gradlew.bat,Artsem Kurantsou,Sun Aug 4 20:40:34 2024 +0100
+gradlew.bat,Frieder Bluemle,Fri May 12 00:31:26 2017 +0800
+gradlew.bat,Scott Alexander-Bown,Fri Jun 19 10:05:10 2015 +0100
+rootbeerlib/src/main/AndroidManifest.xml,Artsem Kurantsou,Sun Aug 4 20:40:34 2024 +0100
+rootbeerlib/src/main/AndroidManifest.xml,Scott Alexander-Bown,Sat May 22 14:42:21 2021 +0100
+rootbeerlib/src/main/AndroidManifest.xml,Alessandro Yuichi Okimoto,Tue Oct 6 17:56:57 2015 +0900
+rootbeerlib/src/main/AndroidManifest.xml,Scott Alexander-Bown,Fri Jun 26 16:50:40 2015 +0100
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeerNative.java,Matthew Rollings,Mon May 24 08:35:11 2021 +0100
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeerNative.java,Scott Alexander-Bown,Sat May 8 15:18:37 2021 +0100
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeerNative.java,Matthew Rollings,Thu Mar 14 12:24:58 2019 +0000
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeerNative.java,Matthew Rollings,Wed Mar 29 12:18:37 2017 +0100
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeerNative.java,Matthew Rollings,Tue Jun 30 15:36:54 2015 +0100
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeerNative.java,Matthew Rollings,Tue Jun 30 15:14:02 2015 +0100
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeerNative.java,Matthew Rollings,Fri Jun 26 16:57:05 2015 +0100
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeerNative.java,Scott Alexander-Bown,Fri Jun 26 16:50:40 2015 +0100
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeerNative.java,Matthew Rollings,Fri Jun 19 12:06:02 2015 +0100
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeerNative.java,Matthew Rollings,Fri Jun 19 11:09:22 2015 +0100
+rootbeerlib/src/main/cpp/toolChecker.cpp,Scott Alexander-Bown,Sat May 22 14:42:21 2021 +0100
+rootbeerlib/src/main/cpp/toolChecker.cpp,Frieder Bluemle,Fri May 12 00:41:00 2017 +0800
+rootbeerlib/src/main/cpp/toolChecker.cpp,matthew,Mon Mar 13 22:55:31 2017 +0000
+rootbeerlib/src/main/cpp/toolChecker.cpp,matthew,Mon Mar 13 22:35:27 2017 +0000
+rootbeerlib/src/main/cpp/toolChecker.cpp,aippisch,Fri Sep 16 16:04:45 2016 +0200
+rootbeerlib/src/main/cpp/toolChecker.cpp,Matthew Rollings,Tue Jun 30 15:36:54 2015 +0100
+rootbeerlib/src/main/cpp/toolChecker.cpp,Matthew Rollings,Tue Jun 30 15:14:02 2015 +0100
+rootbeerlib/src/main/cpp/toolChecker.cpp,Scott Alexander-Bown,Tue Jun 30 13:58:19 2015 +0100
+rootbeerlib/src/main/cpp/toolChecker.cpp,Matthew Rollings,Fri Jun 26 17:10:45 2015 +0100
+rootbeerlib/src/main/cpp/toolChecker.cpp,Scott Alexander-Bown,Fri Jun 26 16:50:40 2015 +0100
+rootbeerlib/src/main/cpp/toolChecker.cpp,Matthew Rollings,Fri Jun 19 12:06:02 2015 +0100
+rootbeerlib/src/main/cpp/toolChecker.cpp,Matthew Rollings,Fri Jun 19 11:09:22 2015 +0100
+rootbeerlib/src/main/cpp/toolChecker.h,Scott Alexander-Bown,Sat May 22 14:42:21 2021 +0100
+rootbeerlib/src/main/cpp/toolChecker.h,Frieder Bluemle,Fri May 12 00:41:00 2017 +0800
+rootbeerlib/src/main/cpp/toolChecker.h,matthew,Mon Mar 13 22:35:27 2017 +0000
+rootbeerlib/src/main/cpp/toolChecker.h,Matthew Rollings,Tue Jun 30 15:36:54 2015 +0100
+rootbeerlib/src/main/cpp/toolChecker.h,Matthew Rollings,Tue Jun 30 15:14:02 2015 +0100
+rootbeerlib/src/main/cpp/toolChecker.h,Matthew Rollings,Fri Jun 26 17:10:45 2015 +0100
+rootbeerlib/src/main/cpp/toolChecker.h,Scott Alexander-Bown,Fri Jun 26 16:50:40 2015 +0100
+rootbeerlib/src/main/cpp/toolChecker.h,Matthew Rollings,Fri Jun 19 12:06:02 2015 +0100
+rootbeerlib/src/main/cpp/toolChecker.h,Matthew Rollings,Fri Jun 19 11:09:22 2015 +0100
+app/src/main/ic_launcher-playstore.png,Scott Alexander-Bown,Sat May 8 17:42:23 2021 +0100
+app/src/main/res/mipmap-hdpi/ic_launcher_foreground.png,Scott Alexander-Bown,Sat May 8 17:42:23 2021 +0100
+app/src/main/res/mipmap-hdpi/ic_launcher_round.png,Scott Alexander-Bown,Sat May 8 17:42:23 2021 +0100
+app/src/main/res/mipmap-mdpi/ic_launcher_foreground.png,Scott Alexander-Bown,Sat May 8 17:42:23 2021 +0100
+app/src/main/res/mipmap-mdpi/ic_launcher_round.png,Scott Alexander-Bown,Sat May 8 17:42:23 2021 +0100
+app/src/main/res/mipmap-xhdpi/ic_launcher_foreground.png,Scott Alexander-Bown,Sat May 8 17:42:23 2021 +0100
+app/src/main/res/mipmap-xhdpi/ic_launcher_round.png,Scott Alexander-Bown,Sat May 8 17:42:23 2021 +0100
+app/src/main/res/mipmap-xxhdpi/ic_launcher_foreground.png,Scott Alexander-Bown,Sat May 8 17:42:23 2021 +0100
+app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png,Scott Alexander-Bown,Sat May 8 17:42:23 2021 +0100
+app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png,Scott Alexander-Bown,Sat May 8 17:42:23 2021 +0100
+app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png,Scott Alexander-Bown,Sat May 8 17:42:23 2021 +0100
+app/src/main/res/values/ic_launcher_background.xml,Scott Alexander-Bown,Sat May 8 17:42:23 2021 +0100
+rootbeerlib/src/main/java/com/scottyab/rootbeer/Const.java,Scott Alexander-Bown,Sat May 8 15:18:37 2021 +0100
+rootbeerlib/src/main/java/com/scottyab/rootbeer/Const.java,Fi5t,Wed Jul 15 23:47:49 2020 +0300
+rootbeerlib/src/main/java/com/scottyab/rootbeer/Const.java,mat,Thu Jan 30 13:09:02 2020 +0000
+rootbeerlib/src/main/java/com/scottyab/rootbeer/Const.java,mat,Tue Jan 28 14:06:12 2020 +0000
+rootbeerlib/src/main/java/com/scottyab/rootbeer/Const.java,Ivan Vlasov,Mon Dec 9 13:32:18 2019 +0300
+rootbeerlib/src/main/java/com/scottyab/rootbeer/Const.java,Matthew Rollings,Thu Mar 14 12:24:58 2019 +0000
+rootbeerlib/src/main/java/com/scottyab/rootbeer/Const.java,altvnv,Fri Mar 16 19:42:19 2018 +0300
+rootbeerlib/src/main/java/com/scottyab/rootbeer/Const.java,altvnv,Fri Mar 16 15:02:21 2018 +0300
+rootbeerlib/src/main/java/com/scottyab/rootbeer/Const.java,altvnv,Fri Mar 16 14:36:53 2018 +0300
+rootbeerlib/src/main/java/com/scottyab/rootbeer/Const.java,Matthew Rollings,Fri Mar 24 13:30:47 2017 +0000
+rootbeerlib/src/main/java/com/scottyab/rootbeer/Const.java,Mohammed Ezzat,Tue Mar 15 15:13:43 2016 +0200
+rootbeerlib/src/main/java/com/scottyab/rootbeer/Const.java,Scott Alexander-Bown,Wed Sep 16 13:13:36 2015 +0100
+rootbeerlib/src/main/java/com/scottyab/rootbeer/Const.java,Scott Alexander-Bown,Tue Jun 30 15:59:48 2015 +0100
+rootbeerlib/src/main/java/com/scottyab/rootbeer/Const.java,Matthew Rollings,Tue Jun 30 14:40:46 2015 +0100
+rootbeerlib/src/main/java/com/scottyab/rootbeer/Const.java,Scott Alexander-Bown,Mon Jun 29 14:06:59 2015 +0100
+rootbeerlib/src/main/java/com/scottyab/rootbeer/Const.java,Scott Alexander-Bown,Fri Jun 26 16:50:40 2015 +0100
+rootbeerlib/src/main/java/com/scottyab/rootbeer/Const.java,Matthew Rollings,Fri Jun 26 15:32:45 2015 +0100
+rootbeerlib/src/test/java/com/scottyab/rootbeer/RootBeerTest.java,Scott Alexander-Bown,Sat May 8 15:18:37 2021 +0100
+rootbeerlib/src/test/java/com/scottyab/rootbeer/RootBeerTest.java,mat,Thu Jan 30 16:12:36 2020 +0000
+rootbeerlib/src/test/java/com/scottyab/rootbeer/RootBeerTest.java,mat,Tue Jan 28 13:03:18 2020 +0000
+rootbeerlib/src/test/java/com/scottyab/rootbeer/RootBeerTest.java,Daniel Kutik,Sat Nov 16 10:34:24 2019 +0800
+rootbeerlib/src/test/java/com/scottyab/rootbeer/RootBeerTest.java,Matthew Rollings,Thu Mar 14 12:24:58 2019 +0000
+rootbeerlib/src/test/java/com/scottyab/rootbeer/RootBeerTest.java,Matthew Rollings,Fri May 11 14:16:33 2018 +0100
+rootbeerlib/src/test/java/com/scottyab/rootbeer/RootBeerTest.java,matthew,Tue Oct 31 18:57:32 2017 +0000
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeer.java,Slim Namouchi,Tue Jul 21 14:19:44 2020 +0100
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeer.java,Matthew Rollings,Tue Jul 21 14:10:44 2020 +0100
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeer.java,mat,Fri Feb 7 09:43:09 2020 +0000
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeer.java,mat,Tue Jan 28 14:06:12 2020 +0000
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeer.java,mat,Tue Jan 28 13:03:18 2020 +0000
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeer.java,mat,Tue Jan 28 12:41:49 2020 +0000
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeer.java,Ivan Vlasov,Mon Dec 9 13:32:18 2019 +0300
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeer.java,Matthew Rollings,Thu Mar 14 12:24:58 2019 +0000
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeer.java,Matthew Rollings,Fri May 11 13:00:38 2018 +0100
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeer.java,Matthew Rollings,Fri May 11 13:00:38 2018 +0100
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeer.java,Matthew Rollings,Fri May 11 11:59:44 2018 +0100
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeer.java,altvnv,Fri Mar 16 19:49:07 2018 +0300
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeer.java,altvnv,Fri Mar 16 19:42:19 2018 +0300
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeer.java,altvnv,Fri Mar 16 15:14:23 2018 +0300
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeer.java,Frieder Bluemle,Sat Aug 19 09:20:33 2017 -0700
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeer.java,Ali Waseem,Fri Aug 11 09:34:54 2017 -0600
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeer.java,BIOCATCH\Leon.Karabchevsky,Wed Jun 7 10:53:52 2017 +0300
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeer.java,vyas,Wed May 10 14:44:29 2017 -0500
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeer.java,Matthew Rollings,Wed Mar 29 12:18:37 2017 +0100
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeer.java,Matthew Rollings,Fri Mar 24 16:11:58 2017 +0000
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeer.java,Matthew Rollings,Fri Mar 24 13:31:19 2017 +0000
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeer.java,Matthew Rollings,Wed Feb 15 12:53:36 2017 +0000
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeer.java,leocadiotine,Wed Sep 14 18:25:21 2016 -0300
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeer.java,Matthew Rollings,Mon Apr 18 17:36:03 2016 +0100
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeer.java,Mohammed Ezzat,Tue Mar 15 15:13:43 2016 +0200
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeer.java,Matthew Rollings,Tue Dec 22 10:17:02 2015 +0000
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeer.java,Matthew Rollings,Tue Dec 22 10:11:09 2015 +0000
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeer.java,Matthew Rollings,Mon Dec 21 20:44:58 2015 +0000
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeer.java,Matthew Rollings,Mon Dec 21 20:43:55 2015 +0000
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeer.java,Scott Alexander-Bown,Tue Jun 30 15:45:12 2015 +0100
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeer.java,Matthew Rollings,Tue Jun 30 15:36:54 2015 +0100
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeer.java,Scott Alexander-Bown,Tue Jun 30 15:14:08 2015 +0100
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeer.java,Matthew Rollings,Tue Jun 30 15:14:02 2015 +0100
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeer.java,Scott Alexander-Bown,Mon Jun 29 14:06:59 2015 +0100
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeer.java,Scott Alexander-Bown,Fri Jun 26 16:50:40 2015 +0100
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeer.java,Matthew Rollings,Fri Jun 26 15:32:45 2015 +0100
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeer.java,Scott Alexander-Bown,Fri Jun 19 18:20:07 2015 +0100
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeer.java,Matthew Rollings,Fri Jun 19 11:09:22 2015 +0100
+rootbeerlib/src/main/java/com/scottyab/rootbeer/RootBeer.java,Scott Alexander-Bown,Fri Jun 19 10:05:10 2015 +0100
+art/RootBeer-tv-graphic.png,mat,Wed Mar 11 09:38:15 2020 +0000
+art/tv-1.png,mat,Wed Mar 11 09:38:15 2020 +0000
+art/tv-2.png,mat,Wed Mar 11 09:38:15 2020 +0000
+art/tv-3.png,mat,Wed Mar 11 09:38:15 2020 +0000
+art/sticker.png,mat,Tue Feb 4 11:41:46 2020 +0000
+rootbeerlib/src/main/java/com/scottyab/rootbeer/util/QLog.java,mat,Fri Feb 7 09:43:09 2020 +0000
+rootbeerlib/src/main/java/com/scottyab/rootbeer/util/QLog.java,matthew,Tue Oct 31 18:57:32 2017 +0000
+rootbeerlib/src/main/java/com/scottyab/rootbeer/util/QLog.java,Frieder Bluemle,Sat Aug 19 09:20:33 2017 -0700
+rootbeerlib/src/main/java/com/scottyab/rootbeer/util/QLog.java,Frieder Bluemle,Fri May 12 00:41:00 2017 +0800
+rootbeerlib/src/main/java/com/scottyab/rootbeer/util/QLog.java,Matthew Rollings,Wed Feb 15 12:53:36 2017 +0000
+rootbeerlib/src/main/java/com/scottyab/rootbeer/util/QLog.java,Mohammed Ezzat,Tue Mar 15 15:13:43 2016 +0200
+rootbeerlib/src/main/java/com/scottyab/rootbeer/util/QLog.java,Scott Alexander-Bown,Fri Jun 26 19:48:49 2015 +0100
+rootbeerlib/src/main/java/com/scottyab/rootbeer/util/QLog.java,Scott Alexander-Bown,Fri Jun 26 16:50:40 2015 +0100
+rootbeerlib/src/main/java/com/scottyab/rootbeer/util/QLog.java,Scott Alexander-Bown,Fri Jun 19 10:05:10 2015 +0100
+.gitattributes,Daniel Kutik,Sat Nov 16 10:39:54 2019 +0800
+.gitignore,Daniel Kutik,Sat Nov 16 10:34:24 2019 +0800
+.gitignore,Frieder Bluemle,Fri May 12 00:43:00 2017 +0800
+.gitignore,Scott Alexander-Bown,Fri Mar 24 14:15:39 2017 +0000
+.gitignore,Scott Alexander-Bown,Fri Mar 24 14:12:34 2017 +0000
+.gitignore,Scott Alexander-Bown,Fri Jul 1 21:13:06 2016 +0100
+.gitignore,Andy Barber,Fri Jul 1 15:40:45 2016 +0100
+.gitignore,Scott Alexander-Bown,Tue Jun 30 17:35:59 2015 +0100
+.gitignore,Scott Alexander-Bown,Tue Jun 30 17:07:59 2015 +0100
+.gitignore,Scott Alexander-Bown,Fri Jun 19 10:06:26 2015 +0100
+.gitignore,Scott Alexander-Bown,Fri Jun 19 10:05:10 2015 +0100
+.gitignore,Scott Alexander-Bown,Fri Jun 19 10:01:56 2015 +0100
+LICENSE,Frieder Bluemle,Fri May 12 00:41:00 2017 +0800
+LICENSE,Scott Alexander-Bown,Fri Jun 19 10:01:56 2015 +0100
+art/ss_got_root_fail.png,Scott Alexander-Bown,Fri Jul 1 21:21:13 2016 +0100
+art/ss_got_root_fail.png,Scott Alexander-Bown,Fri Jul 1 21:13:28 2016 +0100
+art/ss_got_root_fail.png,Scott Alexander-Bown,Wed Sep 16 13:37:52 2015 +0100
+art/RootBeer-feature-graphic.png,Scott Alexander-Bown,Fri Jul 1 21:13:28 2016 +0100
+art/RootBeer-feature-graphic.png,Scott Alexander-Bown,Wed Sep 16 13:37:52 2015 +0100
+art/ss_home_b4_test.png,Scott Alexander-Bown,Fri Jul 1 21:13:28 2016 +0100
+art/ss_info.png,Scott Alexander-Bown,Fri Jul 1 21:13:28 2016 +0100
+art/ss_info.png,Scott Alexander-Bown,Wed Sep 16 13:37:52 2015 +0100
+app/src/main/assets/SubwayNovella.ttf,Andy Barber,Fri Jul 1 15:40:45 2016 +0100
+app/src/main/res/drawable-hdpi/ic_action_github.png,Andy Barber,Fri Jul 1 15:40:45 2016 +0100
+app/src/main/res/drawable-hdpi/ic_action_github.png,Scott Alexander-Bown,Mon Jun 29 14:06:14 2015 +0100
+app/src/main/res/drawable-xhdpi/ic_action_github.png,Andy Barber,Fri Jul 1 15:40:45 2016 +0100
+app/src/main/res/drawable-xhdpi/ic_action_github.png,Scott Alexander-Bown,Mon Jun 29 14:06:14 2015 +0100
+app/src/main/res/drawable-xxhdpi/ic_action_github.png,Andy Barber,Fri Jul 1 15:40:45 2016 +0100
+app/src/main/res/drawable-xxhdpi/ic_action_github.png,Scott Alexander-Bown,Mon Jun 29 14:06:14 2015 +0100
+RootChecker.iml,Scott Alexander-Bown,Mon Mar 14 21:04:13 2016 +0000
+RootChecker.iml,Scott Alexander-Bown,Tue Jun 30 16:51:16 2015 +0100
+RootChecker.iml,Scott Alexander-Bown,Fri Jun 19 18:20:07 2015 +0100
+RootChecker.iml,Scott Alexander-Bown,Fri Jun 19 10:05:10 2015 +0100
+art/rootbeer-icon-playstore.png,Scott Alexander-Bown,Wed Sep 16 13:37:52 2015 +0100
+art/rootbeerjesus.png,Scott Alexander-Bown,Tue Jun 30 16:31:31 2015 +0100
+art/root_beer_icon.svg,Scott Alexander-Bown,Tue Jun 30 13:58:32 2015 +0100
