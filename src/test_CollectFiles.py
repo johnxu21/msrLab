@@ -301,20 +301,33 @@ def test_later_files_page_failure_preserves_existing_csv(monkeypatch, tmp_path, 
     assert csv_path.read_text() == 'Filename,Touches\nold.java,9\n'
 
 
+def commit_a_files_url(page):
+    # The URL of commit a's files page; page 1 is the first request and has no page parameter
+    if page == 1:
+        return 'https://api.github.com/repos/scottyab/rootbeer/commits/a?per_page=100'
+    return 'https://api.github.com/repos/scottyab/rootbeer/commits/a?page={}&per_page=100'.format(page)
+
+
 @pytest.mark.parametrize('last_page_has_next_link', [True, False])
-def test_reaching_file_cap_reports_uncertainty_and_preserves_csv(monkeypatch, tmp_path, capsys, last_page_has_next_link):
+@pytest.mark.parametrize('names_repeat_across_pages', [False, True])
+def test_reaching_file_cap_reports_uncertainty_and_preserves_csv(monkeypatch, tmp_path, capsys,
+                                                                 last_page_has_next_link, names_repeat_across_pages):
     monkeypatch.setattr(CollectFiles, 'GITHUB_TOKEN', 'test-token')
     monkeypatch.chdir(tmp_path)
     (tmp_path / 'data').mkdir()
     csv_path = tmp_path / 'data' / 'file_rootbeer.csv'
     csv_path.write_text('Filename,Touches\nold.java,9\n')
 
-    # 30 pages of 100 unique files make 3000 entries. Whether the last page links onward is a parameter.
+    # 30 pages of 100 entries make 3000 entries. Each page links to the next one, except possibly the last.
+    # With names_repeat_across_pages, every page lists the same 100 paths, so unique paths stay far below the cap.
     pages = []
     for page in range(1, 31):
-        names = ['f{}-{}.java'.format(page, i) for i in range(100)]
+        if names_repeat_across_pages:
+            names = ['shared-{}.java'.format(i) for i in range(100)]
+        else:
+            names = ['f{}-{}.java'.format(page, i) for i in range(100)]
         is_last = page == 30
-        next_url = None if is_last and not last_page_has_next_link else COMMIT_A_PAGE_2
+        next_url = None if is_last and not last_page_has_next_link else commit_a_files_url(page + 1)
         pages.append(files_page(names, next_url=next_url))
     requested = fake_get_sequence(monkeypatch, [
         FakeResponse(body=json.dumps([{'sha': 'a'}]).encode()),
@@ -324,8 +337,12 @@ def test_reaching_file_cap_reports_uncertainty_and_preserves_csv(monkeypatch, tm
     with pytest.raises(SystemExit) as exc:
         CollectFiles.main()
 
-    # The cap is checked after each page, so no request is made past page 30
-    assert len(requested) == 31
+    # Requests follow the next links exactly, and the cap is checked after each page, so none is made past page 30
+    expected_requests = [
+        'https://api.github.com/repos/scottyab/rootbeer/commits?page=1&per_page=100',
+        *[commit_a_files_url(page) for page in range(1, 31)],
+    ]
+    assert requested == expected_requests
     assert exc.value.code == 1
     assert 'cannot be established' in capsys.readouterr().err
     assert csv_path.read_text() == 'Filename,Touches\nold.java,9\n'
