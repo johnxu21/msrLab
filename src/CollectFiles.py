@@ -25,6 +25,12 @@ class GitHubError(Exception):
     pass
 
 
+# Raises GitHubError if GITHUB_TOKEN is missing or blank, before any request is made
+def require_token():
+    if not GITHUB_TOKEN.strip():
+        raise GitHubError('set the GITHUB_TOKEN environment variable before running')
+
+
 # GitHub Authentication function
 # Sends one GET request to the GitHub API and returns the parsed JSON and the URL of the next page (None on the last page).
 # Raises GitHubError if the request times out, cannot connect, returns an error status, or returns invalid JSON.
@@ -118,8 +124,10 @@ repo = 'scottyab/rootbeer'
 
 def main():
     # Stop before doing any work if no token was given
-    if not GITHUB_TOKEN:
-        sys.stderr.write("Error: set the GITHUB_TOKEN environment variable before running this script.\n")
+    try:
+        require_token()
+    except GitHubError as e:
+        sys.stderr.write("Error: {}.\n".format(e))
         sys.exit(1)
 
     # Collect the file counts; dictfiles is filled in by countfiles
