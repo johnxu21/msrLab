@@ -184,7 +184,7 @@ def test_main_writes_csv_with_counts(monkeypatch, tmp_path, capsys):
 def test_failure_after_earlier_success_exits_and_writes_no_csv(monkeypatch, tmp_path, capsys):
     monkeypatch.setattr(CollectFiles, 'GITHUB_TOKEN', 'test-token')
     monkeypatch.chdir(tmp_path)
-    # Commit list and first commit succeed; the second commit's details time out
+    # First commit page and its commit details succeed; the next commit-list page times out
     fake_get_sequence(monkeypatch, [
         FakeResponse(body=json.dumps([{'sha': 'a'}]).encode()),
         FakeResponse(body=json.dumps({'files': [{'filename': 'x.java'}]}).encode()),
@@ -205,7 +205,12 @@ def test_failure_does_not_overwrite_existing_csv(monkeypatch, tmp_path, capsys):
     (tmp_path / 'data').mkdir()
     csv_path = tmp_path / 'data' / 'file_rootbeer.csv'
     csv_path.write_text('Filename,Touches\nold.java,9\n')
-    fake_get_sequence(monkeypatch, [FakeResponse(status_code=401)])
+    # First commit page and its details succeed, so real counts are collected before the 401 on page 2
+    fake_get_sequence(monkeypatch, [
+        FakeResponse(body=json.dumps([{'sha': 'a'}]).encode()),
+        FakeResponse(body=json.dumps({'files': [{'filename': 'x.java'}]}).encode()),
+        FakeResponse(status_code=401),
+    ])
 
     with pytest.raises(SystemExit) as exc:
         CollectFiles.main()
