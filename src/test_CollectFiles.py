@@ -13,33 +13,51 @@ import CollectFiles
 FAKE_RESPONSES = {
     'https://api.github.com/repos/scottyab/rootbeer/commits?page=1&per_page=100': [{'sha': 'a'}, {'sha': 'b'}],
     'https://api.github.com/repos/scottyab/rootbeer/commits?page=2&per_page=100': [],
-    'https://api.github.com/repos/scottyab/rootbeer/commits/a': {'files': [{'filename': 'x.java'}, {'filename': 'y.java'}]},
-    'https://api.github.com/repos/scottyab/rootbeer/commits/b': {'files': [{'filename': 'x.java'}]},
+    'https://api.github.com/repos/scottyab/rootbeer/commits/a?per_page=100': {'files': [{'filename': 'x.java'}, {'filename': 'y.java'}]},
+    'https://api.github.com/repos/scottyab/rootbeer/commits/b?per_page=100': {'files': [{'filename': 'x.java'}]},
 }
 
-
-def fake_github_auth(url):
-    return FAKE_RESPONSES[url]
+# Later files pages for commit a are requested through a next link
+COMMIT_A_PAGE_2 = 'https://api.github.com/repos/scottyab/rootbeer/commits/a?page=2&per_page=100'
 
 
 class FakeResponse:
-    def __init__(self, body=b'[]', status_code=200, headers=None):
+    def __init__(self, body=b'[]', status_code=200, headers=None, links=None):
         self.content = body
         self.status_code = status_code
         self.headers = headers or {}
+        self.links = links or {}
+
+
+def files_page(names, next_url=None):
+    # One page of a commit's changed files, with a next link when more pages exist
+    body = json.dumps({'files': [{'filename': name} for name in names]}).encode()
+    links = {'next': {'url': next_url}} if next_url else {}
+    return FakeResponse(body=body, links=links)
+
+
+def fake_get_routes(monkeypatch, routes):
+    # Each URL returns its JSON body from routes
+    def fake_get(url, headers, timeout):
+        return FakeResponse(body=json.dumps(routes[url]).encode())
+
+    monkeypatch.setattr(CollectFiles.requests, 'get', fake_get)
 
 
 def fake_get_sequence(monkeypatch, outcomes):
     # Each call to requests.get returns the next outcome; an exception instance is raised instead
     calls = iter(outcomes)
+    requested = []
 
     def fake_get(url, headers, timeout):
+        requested.append(url)
         outcome = next(calls)
         if isinstance(outcome, Exception):
             raise outcome
         return outcome
 
     monkeypatch.setattr(CollectFiles.requests, 'get', fake_get)
+    return requested
 
 
 def test_github_auth_sends_token_with_timeout_and_returns_parsed_json(monkeypatch):
@@ -56,6 +74,17 @@ def test_github_auth_sends_token_with_timeout_and_returns_parsed_json(monkeypatc
     assert CollectFiles.github_auth('https://api.github.com/some/url') == {'ok': True}
     assert seen['headers']['Authorization'] == 'Bearer test-token'
     assert seen['timeout'] == CollectFiles.REQUEST_TIMEOUT
+
+
+def test_github_request_returns_next_link(monkeypatch):
+    fake_get_sequence(monkeypatch, [
+        FakeResponse(body=b'[]', links={'next': {'url': 'https://api.github.com/next'}}),
+    ])
+
+    data, next_url = CollectFiles.github_request('https://api.github.com/some/url')
+
+    assert data == []
+    assert next_url == 'https://api.github.com/next'
 
 
 def test_github_auth_raises_on_http_401_without_leaking_token(monkeypatch):
@@ -110,7 +139,39 @@ def test_github_auth_raises_on_invalid_json(monkeypatch):
 
 
 def test_countfiles_counts_each_file_once_per_commit(monkeypatch):
-    monkeypatch.setattr(CollectFiles, 'github_auth', fake_github_auth)
+    fake_get_routes(monkeypatch, FAKE_RESPONSES)
+    dictfiles = {}
+
+    CollectFiles.countfiles(dictfiles, 'scottyab/rootbeer')
+
+    assert dictfiles == {'x.java': 2, 'y.java': 1}
+
+
+def test_countfiles_follows_next_links_across_file_pages(monkeypatch):
+    requested = fake_get_sequence(monkeypatch, [
+        FakeResponse(body=json.dumps([{'sha': 'a'}]).encode()),
+        files_page(['x.java', 'y.java'], next_url=COMMIT_A_PAGE_2),
+        files_page(['z.java']),
+        FakeResponse(body=b'[]'),
+    ])
+    dictfiles = {}
+
+    CollectFiles.countfiles(dictfiles, 'scottyab/rootbeer')
+
+    assert dictfiles == {'x.java': 1, 'y.java': 1, 'z.java': 1}
+    assert requested[1] == 'https://api.github.com/repos/scottyab/rootbeer/commits/a?per_page=100'
+    assert requested[2] == COMMIT_A_PAGE_2
+
+
+def test_duplicate_paths_count_once_per_commit(monkeypatch):
+    # x.java appears on both pages of commit a, and on commit b
+    fake_get_sequence(monkeypatch, [
+        FakeResponse(body=json.dumps([{'sha': 'a'}, {'sha': 'b'}]).encode()),
+        files_page(['x.java'], next_url=COMMIT_A_PAGE_2),
+        files_page(['x.java', 'y.java']),
+        files_page(['x.java']),
+        FakeResponse(body=b'[]'),
+    ])
     dictfiles = {}
 
     CollectFiles.countfiles(dictfiles, 'scottyab/rootbeer')
@@ -168,7 +229,7 @@ def test_main_handles_repo_with_no_files(monkeypatch, tmp_path, capsys):
 
 def test_main_writes_csv_with_counts(monkeypatch, tmp_path, capsys):
     monkeypatch.setattr(CollectFiles, 'GITHUB_TOKEN', 'test-token')
-    monkeypatch.setattr(CollectFiles, 'github_auth', fake_github_auth)
+    fake_get_routes(monkeypatch, FAKE_RESPONSES)
     monkeypatch.chdir(tmp_path)
 
     CollectFiles.main()
@@ -216,4 +277,55 @@ def test_failure_does_not_overwrite_existing_csv(monkeypatch, tmp_path, capsys):
         CollectFiles.main()
 
     assert exc.value.code == 1
+    assert csv_path.read_text() == 'Filename,Touches\nold.java,9\n'
+
+
+def test_later_files_page_failure_preserves_existing_csv(monkeypatch, tmp_path, capsys):
+    monkeypatch.setattr(CollectFiles, 'GITHUB_TOKEN', 'test-token')
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / 'data').mkdir()
+    csv_path = tmp_path / 'data' / 'file_rootbeer.csv'
+    csv_path.write_text('Filename,Touches\nold.java,9\n')
+    # Commit a's first files page succeeds and links to page 2, which returns a server error
+    fake_get_sequence(monkeypatch, [
+        FakeResponse(body=json.dumps([{'sha': 'a'}]).encode()),
+        files_page(['x.java'], next_url=COMMIT_A_PAGE_2),
+        FakeResponse(status_code=500),
+    ])
+
+    with pytest.raises(SystemExit) as exc:
+        CollectFiles.main()
+
+    assert exc.value.code == 1
+    assert 'HTTP 500' in capsys.readouterr().err
+    assert csv_path.read_text() == 'Filename,Touches\nold.java,9\n'
+
+
+@pytest.mark.parametrize('last_page_has_next_link', [True, False])
+def test_reaching_file_cap_reports_uncertainty_and_preserves_csv(monkeypatch, tmp_path, capsys, last_page_has_next_link):
+    monkeypatch.setattr(CollectFiles, 'GITHUB_TOKEN', 'test-token')
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / 'data').mkdir()
+    csv_path = tmp_path / 'data' / 'file_rootbeer.csv'
+    csv_path.write_text('Filename,Touches\nold.java,9\n')
+
+    # 30 pages of 100 unique files make 3000 entries. Whether the last page links onward is a parameter.
+    pages = []
+    for page in range(1, 31):
+        names = ['f{}-{}.java'.format(page, i) for i in range(100)]
+        is_last = page == 30
+        next_url = None if is_last and not last_page_has_next_link else COMMIT_A_PAGE_2
+        pages.append(files_page(names, next_url=next_url))
+    requested = fake_get_sequence(monkeypatch, [
+        FakeResponse(body=json.dumps([{'sha': 'a'}]).encode()),
+        *pages,
+    ])
+
+    with pytest.raises(SystemExit) as exc:
+        CollectFiles.main()
+
+    # The cap is checked after each page, so no request is made past page 30
+    assert len(requested) == 31
+    assert exc.value.code == 1
+    assert 'cannot be established' in capsys.readouterr().err
     assert csv_path.read_text() == 'Filename,Touches\nold.java,9\n'
