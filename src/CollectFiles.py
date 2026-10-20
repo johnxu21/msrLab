@@ -10,54 +10,72 @@ import os
 # Never put a real token in this file or commit it to GitHub.
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "").strip()
 
+# Seconds to wait for GitHub before giving up on one request
+REQUEST_TIMEOUT = 30
+
+
+# Raised when a GitHub API request fails, so main() can report it and stop
+class GitHubError(Exception):
+    pass
+
+
 # GitHub Authentication function
 # Sends one GET request to the GitHub API and returns the parsed JSON.
-# Returns None if the request or the JSON parsing fails (the error is printed).
+# Raises GitHubError if the request times out, cannot connect, returns an error status, or returns invalid JSON.
 def github_auth(url):
-    jsonData = None
+    # The token goes in the Authorization header so GitHub knows who is asking
+    headers = {'Authorization': 'Bearer {}'.format(GITHUB_TOKEN)}
     try:
-        # The token goes in the Authorization header so GitHub knows who is asking
-        headers = {'Authorization': 'Bearer {}'.format(GITHUB_TOKEN)}
-        request = requests.get(url, headers=headers)
-        # request.content holds the raw response body; json.loads turns it into Python lists/dicts
-        jsonData = json.loads(request.content)
-    except Exception as e:
-        print(e)
-    return jsonData
+        response = requests.get(url, headers=headers, timeout=REQUEST_TIMEOUT)
+    except requests.Timeout:
+        raise GitHubError('Request timed out after {} seconds: {}'.format(REQUEST_TIMEOUT, url))
+    except requests.ConnectionError:
+        raise GitHubError('Could not connect to GitHub: {}'.format(url))
+
+    # GitHub reports rate limits as 403 or 429 with X-RateLimit-Remaining set to 0
+    if response.status_code in (403, 429) and response.headers.get('X-RateLimit-Remaining') == '0':
+        reset = response.headers.get('X-RateLimit-Reset', 'unknown')
+        raise GitHubError('GitHub API rate limit reached. Resets at Unix time {}.'.format(reset))
+    if response.status_code == 401:
+        raise GitHubError('GitHub rejected the token (HTTP 401). Check that GITHUB_TOKEN is valid.')
+    if not 200 <= response.status_code < 300:
+        raise GitHubError('GitHub returned HTTP {} for {}'.format(response.status_code, url))
+
+    try:
+        # response.content holds the raw response body; json.loads turns it into Python lists/dicts
+        return json.loads(response.content)
+    except ValueError:
+        raise GitHubError('GitHub returned invalid JSON for {}'.format(url))
 
 # @dictFiles, empty dictionary of files (filename -> number of commits that touched it)
 # @repo, GitHub repo, in the form 'owner/name'
+# Raises GitHubError if any request fails; dictfiles may then hold partial counts
 def countfiles(dictfiles, repo):
     ipage = 1  # url page counter
 
-    try:
-        # loop though all the commit pages until the last returned empty page
-        while True:
-            spage = str(ipage)
-            commitsUrl = 'https://api.github.com/repos/' + repo + '/commits?page=' + spage + '&per_page=100'
-            jsonCommits = github_auth(commitsUrl)
+    # loop though all the commit pages until the last returned empty page
+    while True:
+        spage = str(ipage)
+        commitsUrl = 'https://api.github.com/repos/' + repo + '/commits?page=' + spage + '&per_page=100'
+        jsonCommits = github_auth(commitsUrl)
 
-            # break out of the while loop if there are no more commits in the pages
-            if len(jsonCommits) == 0:
-                break
-            # iterate through the list of commits in  spage
-            for shaObject in jsonCommits:
-                # Each commit has a unique id called a sha
-                sha = shaObject['sha']
-                # For each commit, use the GitHub commit API to extract the files touched by the commit
-                shaUrl = 'https://api.github.com/repos/' + repo + '/commits/' + sha
-                shaDetails = github_auth(shaUrl)
-                filesjson = shaDetails['files']
-                # Add 1 to the count for each file this commit touched
-                for filenameObj in filesjson:
-                    filename = filenameObj['filename']
-                    dictfiles[filename] = dictfiles.get(filename, 0) + 1
-                    print(filename)
-            ipage += 1
-    except:
-        # Any unexpected error (for example, a bad token or a rate limit) ends the script here
-        print("Error receiving data")
-        sys.exit(1)
+        # break out of the while loop if there are no more commits in the pages
+        if len(jsonCommits) == 0:
+            break
+        # iterate through the list of commits in  spage
+        for shaObject in jsonCommits:
+            # Each commit has a unique id called a sha
+            sha = shaObject['sha']
+            # For each commit, use the GitHub commit API to extract the files touched by the commit
+            shaUrl = 'https://api.github.com/repos/' + repo + '/commits/' + sha
+            shaDetails = github_auth(shaUrl)
+            filesjson = shaDetails['files']
+            # Add 1 to the count for each file this commit touched
+            for filenameObj in filesjson:
+                filename = filenameObj['filename']
+                dictfiles[filename] = dictfiles.get(filename, 0) + 1
+                print(filename)
+        ipage += 1
 
 # GitHub repo
 # To analyze a different project, change this line to 'owner/name' (the part after github.com/)
@@ -74,14 +92,19 @@ def main():
         sys.stderr.write("Error: set the GITHUB_TOKEN environment variable before running this script.\n")
         sys.exit(1)
 
+    # Collect the file counts; dictfiles is filled in by countfiles
+    dictfiles = dict()
+    try:
+        countfiles(dictfiles, repo)
+    except GitHubError as e:
+        # Exit before the CSV is opened, so a failed run never replaces an existing file with partial results
+        sys.stderr.write("Error: {}. No CSV was written.\n".format(e))
+        sys.exit(1)
+    print('Total number of files: ' + str(len(dictfiles)))
+
     # Create the data/ folder for the CSV output if it does not exist yet
     if not os.path.exists("data"):
         os.makedirs("data")
-
-    # Collect the file counts; dictfiles is filled in by countfiles
-    dictfiles = dict()
-    countfiles(dictfiles, repo)
-    print('Total number of files: ' + str(len(dictfiles)))
 
     # Build the output file name from the repo name, e.g. 'rootbeer' -> data/file_rootbeer.csv
     file = repo.split('/')[1]
