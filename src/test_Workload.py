@@ -57,25 +57,36 @@ def notebook_namespace(monkeypatch, responses, token='test-token'):
     exec(cell_containing('ignore_date = '), ns)
     ns['reponame'] = 'example/repo'
     exec(cell_containing('def fetch'), ns)
+    exec(cell_containing('def invalidate'), ns)
     exec(cell_containing('def login_of'), ns)
     return ns
 
 
-def run_collection(ns):
-    # The reset cell, then the two collection cells, as the notebook runs them
-    exec(cell_containing('RESULT_NAMES = ['), ns)
+def run_pr(ns):
     exec(cell_containing('def pullrequest_details'), ns)
+
+
+def run_issues(ns):
     exec(cell_containing('def issue_details'), ns)
 
 
-def run_dataframe_join(monkeypatch, responses):
+def run_collection(ns):
+    run_pr(ns)
+    run_issues(ns)
+
+
+def build_tables(ns):
     # Run the DataFrame construction and the join, stopping before the plotting-selection filters (head and sort)
-    ns = notebook_namespace(monkeypatch, responses)
-    run_collection(ns)
     exec(cell_containing('df_pr = pd.DataFrame'), ns)
     join_code = cell_containing('df_list = [')
     before_filters, _ = join_code.split('df_merged = df_merged.fillna(0)')
     exec(before_filters, ns)
+
+
+def run_dataframe_join(monkeypatch, responses):
+    ns = notebook_namespace(monkeypatch, responses)
+    run_collection(ns)
+    build_tables(ns)
     return ns
 
 
@@ -151,7 +162,7 @@ def test_deleted_accounts_are_skipped_and_counted(monkeypatch):
 
     assert ns['contributor_pr_count'] == {'bob': 1}
     assert ns['contributor_pr_review_count'] == {'carol': 1}
-    assert ns['unattributed_count'] == 2
+    assert ns['unattributed'] == {'pr': 2, 'issues': 0}
 
 
 def test_self_review_is_excluded_by_value_not_identity(monkeypatch):
@@ -180,7 +191,7 @@ def test_missing_pr_author_still_credits_identifiable_reviewers(monkeypatch):
     assert ns['contributor_pr_count'] == {}
     assert ns['contributor_changedFiles_count'] == {}
     assert ns['contributor_pr_review_count'] == {'dan': 1}
-    assert ns['unattributed_count'] == 1
+    assert ns['unattributed'] == {'pr': 1, 'issues': 0}
 
 
 def test_missing_issue_author_still_credits_identifiable_commenters(monkeypatch):
@@ -195,7 +206,7 @@ def test_missing_issue_author_still_credits_identifiable_commenters(monkeypatch)
 
     assert ns['contributor_issue_count'] == {}
     assert ns['contributor_comment_count'] == {'erin': 1}
-    assert ns['unattributed_count'] == 1
+    assert ns['unattributed'] == {'pr': 0, 'issues': 1}
 
 
 def test_review_only_and_comment_only_participants_are_separate_rows_by_login(monkeypatch):
@@ -241,31 +252,54 @@ def test_failure_on_a_later_page_stores_nothing(monkeypatch):
     assert 'contributor_pr_count' not in ns
 
 
-def test_failed_rerun_does_not_reuse_earlier_results(monkeypatch):
-    ns = notebook_namespace(monkeypatch, pr_responses([merged_pr(1, 'alice')]))
-    run_collection(ns)
-    exec(cell_containing('df_pr = pd.DataFrame'), ns)
-    assert ns['contributor_pr_count'] == {'alice': 1} and 'df_pr' in ns
+@pytest.mark.parametrize('token', ['', '   '])
+def test_missing_token_clears_populated_results_before_failing(monkeypatch, token):
+    # Results from a successful run are present, then a rerun starts with a missing or blank token
+    ns = run_dataframe_join(monkeypatch, pr_responses([merged_pr(1, 'alice')]))
+    assert 'df_merged' in ns and 'contributor_pr_count' in ns
 
-    # The same kernel reruns while GitHub fails
-    fake_requests(monkeypatch, {PR_LIST_URL: FakeResponse(status_code=500)})
-    with pytest.raises(CollectFiles.GitHubError):
-        run_collection(ns)
+    monkeypatch.setattr(CollectFiles, 'GITHUB_TOKEN', token)
+    fake_requests(monkeypatch, {})
 
-    for name in ('contributor_pr_count', 'contributor_issue_count', 'df_pr', 'df_merged'):
+    with pytest.raises(CollectFiles.GitHubError, match='GITHUB_TOKEN'):
+        run_pr(ns)
+
+    for name in ('contributor_pr_count', 'df_pr', 'df_list', 'df_merged'):
         assert name not in ns
 
 
-@pytest.mark.parametrize('token', ['', '   '])
-def test_missing_or_blank_token_fails_before_any_request(monkeypatch, token):
-    def no_requests(*args, **kwargs):
-        raise AssertionError('a request was made without a token')
+def test_failed_pr_rerun_clears_pr_results_and_joined_table_only(monkeypatch):
+    responses = pr_responses([merged_pr(1, 'alice')])
+    responses[ISSUE_LIST_URL] = [issue(10, 'erin')]
+    ns = notebook_namespace(monkeypatch, responses)
+    run_collection(ns)
+    build_tables(ns)
 
-    ns = notebook_namespace(monkeypatch, {}, token=token)
-    monkeypatch.setattr(CollectFiles.requests, 'get', no_requests)
+    fake_requests(monkeypatch, {PR_LIST_URL: FakeResponse(status_code=500)})
+    with pytest.raises(CollectFiles.GitHubError):
+        run_pr(ns)
 
-    with pytest.raises(CollectFiles.GitHubError, match='GITHUB_TOKEN'):
-        run_collection(ns)
+    for name in ('contributor_pr_count', 'df_pr', 'df_list', 'df_merged'):
+        assert name not in ns
+    # The issue step did not run, so its own results are still the result of a successful run
+    assert ns['df_issues'].shape[0] == 1
+
+
+def test_failed_issue_rerun_clears_issue_results_and_joined_table_only(monkeypatch):
+    responses = pr_responses([merged_pr(1, 'alice')])
+    responses[ISSUE_LIST_URL] = [issue(10, 'erin')]
+    ns = notebook_namespace(monkeypatch, responses)
+    run_collection(ns)
+    build_tables(ns)
+
+    fake_requests(monkeypatch, {ISSUE_LIST_URL: FakeResponse(status_code=500)})
+    with pytest.raises(CollectFiles.GitHubError):
+        run_issues(ns)
+
+    for name in ('contributor_issue_count', 'contributor_comment_count', 'df_issues', 'df_issues_comments', 'df_list', 'df_merged'):
+        assert name not in ns
+    # The PR step did not run, so its own results are still the result of a successful run
+    assert ns['df_pr'].shape[0] == 1
 
 
 def test_error_messages_never_show_the_token(monkeypatch, capsys):
