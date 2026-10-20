@@ -1,6 +1,8 @@
 import json
 import os
 
+import pandas as pd
+
 NOTEBOOK = os.path.join(os.path.dirname(__file__), 'Workload.ipynb')
 PR_LIST_URL = 'https://api.github.com/repos/example/repo/pulls?page=1&per_page=100&state=closed'
 ISSUE_LIST_URL = 'https://api.github.com/repos/example/repo/issues?page=1&per_page=100&state=all'
@@ -115,3 +117,57 @@ def test_self_review_is_excluded_by_value_not_identity():
     ns = run_workload(pr_responses(prs, reviews))
 
     assert ns['contributor_pr_review_count'] == {'dan': 1}
+
+
+def test_missing_pr_author_still_credits_identifiable_reviewers():
+    # The PR's author was deleted, so its PR count and file metrics are skipped, but the reviewer is still credited
+    prs = [merged_pr(1, None)]
+    reviews = {1: [{'user': user('dan')}]}
+
+    ns = run_workload(pr_responses(prs, reviews))
+
+    assert ns['contributor_pr_count'] == {}
+    assert ns['contributor_changedFiles_count'] == {}
+    assert ns['contributor_pr_review_count'] == {'dan': 1}
+    assert ns['unattributed_count'] == 1
+
+
+def test_missing_issue_author_still_credits_identifiable_commenters():
+    # The issue's author was deleted, so its issue count is skipped, but the commenter is still credited
+    responses = {
+        ISSUE_LIST_URL: [issue(10, None)],
+        'https://api.github.com/repos/example/repo/issues/10/comments': [{'user': user('erin')}],
+    }
+
+    ns = run_workload(responses)
+
+    assert ns['contributor_issue_count'] == {}
+    assert ns['contributor_comment_count'] == {'erin': 1}
+    assert ns['unattributed_count'] == 1
+
+
+def run_dataframe_join(responses):
+    # Run the DataFrame construction and the join, stopping before the plotting-selection filters (head and sort)
+    ns = run_workload(responses)
+    exec(cell_containing('df_pr = pd.DataFrame'), ns)
+    join_code = cell_containing('df_list = [')
+    before_filters, after_filters = join_code.split('df_merged = df_merged.fillna(0)')
+    exec(before_filters, ns)
+    return ns
+
+
+def test_review_only_and_comment_only_participants_are_separate_rows_by_login():
+    prs = [merged_pr(1, 'alice')]
+    reviews = {1: [{'user': user('dan')}]}
+    responses = pr_responses(prs, reviews)
+    responses[ISSUE_LIST_URL] = [issue(10, 'alice')]
+    responses['https://api.github.com/repos/example/repo/issues/10/comments'] = [{'user': user('erin')}]
+
+    ns = run_dataframe_join(responses)
+    df = ns['df_merged'].set_index('Login')
+
+    assert sorted(df.index) == ['alice', 'dan', 'erin']
+    assert df.loc['alice', 'PRs'] == 1 and df.loc['alice', 'Issues'] == 1
+    # Review-only and comment-only rows have no count for the other activity; they are not merged into another row
+    assert df.loc['dan', 'PR_Reviews'] == 1 and pd.isna(df.loc['dan', 'PRs'])
+    assert df.loc['erin', 'Issue_Comments'] == 1 and pd.isna(df.loc['erin', 'PRs'])
