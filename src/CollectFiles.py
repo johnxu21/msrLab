@@ -13,6 +13,12 @@ GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "").strip()
 # Seconds to wait for GitHub before giving up on one request
 REQUEST_TIMEOUT = 30
 
+# Largest page size GitHub accepts for a commit's list of changed files
+FILES_PER_PAGE = 100
+
+# GitHub documents a limit of 3000 changed files per commit, counted across all of its pages
+MAX_FILES_PER_COMMIT = 3000
+
 
 # Raised when a GitHub API request fails, so main() can report it and stop
 class GitHubError(Exception):
@@ -20,9 +26,9 @@ class GitHubError(Exception):
 
 
 # GitHub Authentication function
-# Sends one GET request to the GitHub API and returns the parsed JSON.
+# Sends one GET request to the GitHub API and returns the parsed JSON and the URL of the next page (None on the last page).
 # Raises GitHubError if the request times out, cannot connect, returns an error status, or returns invalid JSON.
-def github_auth(url):
+def github_request(url):
     # The token goes in the Authorization header so GitHub knows who is asking
     headers = {'Authorization': 'Bearer {}'.format(GITHUB_TOKEN)}
     try:
@@ -43,9 +49,36 @@ def github_auth(url):
 
     try:
         # response.content holds the raw response body; json.loads turns it into Python lists/dicts
-        return json.loads(response.content)
+        data = json.loads(response.content)
     except ValueError:
         raise GitHubError('GitHub returned invalid JSON for {}'.format(url))
+    # requests parses the Link header; GitHub sends rel="next" when more pages exist
+    next_url = response.links.get('next', {}).get('url')
+    return data, next_url
+
+
+# Returns only the parsed JSON for one GitHub API request
+def github_auth(url):
+    data, _ = github_request(url)
+    return data
+
+
+# @sha_url, the commit API URL for one commit
+# Returns the unique file paths that commit touched, in the order GitHub listed them.
+# Follows every files page. Raises GitHubError if the cap is reached, since the list may be incomplete and completeness cannot be established.
+def commit_files(sha_url):
+    paths = {}  # a dict keeps first-seen order and drops duplicate paths
+    entries = 0  # file entries returned by GitHub, counted toward the cap separately from unique paths
+    url = sha_url + '?per_page=' + str(FILES_PER_PAGE)
+    while url:
+        shaDetails, url = github_request(url)
+        filesjson = shaDetails['files']
+        entries += len(filesjson)
+        paths.update(dict.fromkeys(filenameObj['filename'] for filenameObj in filesjson))
+        if entries >= MAX_FILES_PER_COMMIT:
+            raise GitHubError('{} files reached GitHub\'s limit of {} for {}; the complete file list cannot be established'.format(
+                entries, MAX_FILES_PER_COMMIT, sha_url))
+    return list(paths)
 
 # @dictFiles, empty dictionary of files (filename -> number of commits that touched it)
 # @repo, GitHub repo, in the form 'owner/name'
@@ -68,11 +101,8 @@ def countfiles(dictfiles, repo):
             sha = shaObject['sha']
             # For each commit, use the GitHub commit API to extract the files touched by the commit
             shaUrl = 'https://api.github.com/repos/' + repo + '/commits/' + sha
-            shaDetails = github_auth(shaUrl)
-            filesjson = shaDetails['files']
-            # Add 1 to the count for each file this commit touched
-            for filenameObj in filesjson:
-                filename = filenameObj['filename']
+            # Add 1 to the count for each unique file this commit touched
+            for filename in commit_files(shaUrl):
                 dictfiles[filename] = dictfiles.get(filename, 0) + 1
                 print(filename)
         ipage += 1
