@@ -1,7 +1,9 @@
 import csv
+import importlib
 import json
 
 import pytest
+import requests
 
 import CollectFiles
 
@@ -21,33 +23,90 @@ def fake_github_auth(url):
 
 
 class FakeResponse:
-    def __init__(self, body):
+    def __init__(self, body=b'[]', status_code=200, headers=None):
         self.content = body
+        self.status_code = status_code
+        self.headers = headers or {}
 
 
-def test_github_auth_sends_token_and_returns_parsed_json(monkeypatch):
+def fake_get_sequence(monkeypatch, outcomes):
+    # Each call to requests.get returns the next outcome; an exception instance is raised instead
+    calls = iter(outcomes)
+
+    def fake_get(url, headers, timeout):
+        outcome = next(calls)
+        if isinstance(outcome, Exception):
+            raise outcome
+        return outcome
+
+    monkeypatch.setattr(CollectFiles.requests, 'get', fake_get)
+
+
+def test_github_auth_sends_token_with_timeout_and_returns_parsed_json(monkeypatch):
     seen = {}
 
-    def fake_get(url, headers):
+    def fake_get(url, headers, timeout):
         seen['headers'] = headers
+        seen['timeout'] = timeout
         return FakeResponse(json.dumps({'ok': True}).encode())
 
     monkeypatch.setattr(CollectFiles, 'GITHUB_TOKEN', 'test-token')
     monkeypatch.setattr(CollectFiles.requests, 'get', fake_get)
 
-    result = CollectFiles.github_auth('https://api.github.com/some/url')
-
-    assert result == {'ok': True}
+    assert CollectFiles.github_auth('https://api.github.com/some/url') == {'ok': True}
     assert seen['headers']['Authorization'] == 'Bearer test-token'
+    assert seen['timeout'] == CollectFiles.REQUEST_TIMEOUT
 
 
-def test_github_auth_returns_none_when_request_fails(monkeypatch):
-    def failing_get(url, headers):
-        raise ConnectionError('no network')
+def test_github_auth_raises_on_http_401_without_leaking_token(monkeypatch):
+    monkeypatch.setattr(CollectFiles, 'GITHUB_TOKEN', 'test-token')
+    fake_get_sequence(monkeypatch, [FakeResponse(status_code=401)])
 
-    monkeypatch.setattr(CollectFiles.requests, 'get', failing_get)
+    with pytest.raises(CollectFiles.GitHubError) as exc:
+        CollectFiles.github_auth('https://api.github.com/some/url')
 
-    assert CollectFiles.github_auth('https://api.github.com/some/url') is None
+    assert 'HTTP 401' in str(exc.value)
+    assert 'GITHUB_TOKEN' in str(exc.value)
+    assert 'test-token' not in str(exc.value)
+
+
+def test_github_auth_raises_on_rate_limit(monkeypatch):
+    headers = {'X-RateLimit-Remaining': '0', 'X-RateLimit-Reset': '1700000000'}
+    fake_get_sequence(monkeypatch, [FakeResponse(status_code=403, headers=headers)])
+
+    with pytest.raises(CollectFiles.GitHubError) as exc:
+        CollectFiles.github_auth('https://api.github.com/some/url')
+
+    assert 'rate limit' in str(exc.value)
+    assert '1700000000' in str(exc.value)
+
+
+def test_github_auth_raises_on_other_http_error(monkeypatch):
+    fake_get_sequence(monkeypatch, [FakeResponse(status_code=500)])
+
+    with pytest.raises(CollectFiles.GitHubError, match='HTTP 500'):
+        CollectFiles.github_auth('https://api.github.com/some/url')
+
+
+def test_github_auth_raises_on_timeout(monkeypatch):
+    fake_get_sequence(monkeypatch, [requests.Timeout('slow')])
+
+    with pytest.raises(CollectFiles.GitHubError, match='timed out'):
+        CollectFiles.github_auth('https://api.github.com/some/url')
+
+
+def test_github_auth_raises_on_connection_failure(monkeypatch):
+    fake_get_sequence(monkeypatch, [requests.ConnectionError('no network')])
+
+    with pytest.raises(CollectFiles.GitHubError, match='Could not connect'):
+        CollectFiles.github_auth('https://api.github.com/some/url')
+
+
+def test_github_auth_raises_on_invalid_json(monkeypatch):
+    fake_get_sequence(monkeypatch, [FakeResponse(body=b'<html>not json</html>')])
+
+    with pytest.raises(CollectFiles.GitHubError, match='invalid JSON'):
+        CollectFiles.github_auth('https://api.github.com/some/url')
 
 
 def test_countfiles_counts_each_file_once_per_commit(monkeypatch):
@@ -59,14 +118,14 @@ def test_countfiles_counts_each_file_once_per_commit(monkeypatch):
     assert dictfiles == {'x.java': 2, 'y.java': 1}
 
 
-def test_countfiles_exits_with_status_1_on_bad_response(monkeypatch):
-    # github_auth returns None on failure; len(None) then raises inside countfiles
-    monkeypatch.setattr(CollectFiles, 'github_auth', lambda url: None)
+def test_countfiles_lets_github_error_propagate(monkeypatch):
+    def failing_auth(url):
+        raise CollectFiles.GitHubError('boom')
 
-    with pytest.raises(SystemExit) as exc:
+    monkeypatch.setattr(CollectFiles, 'github_auth', failing_auth)
+
+    with pytest.raises(CollectFiles.GitHubError, match='boom'):
         CollectFiles.countfiles({}, 'scottyab/rootbeer')
-
-    assert exc.value.code == 1
 
 
 def test_main_exits_without_creating_data_when_token_is_missing(monkeypatch, tmp_path, capsys):
@@ -79,6 +138,18 @@ def test_main_exits_without_creating_data_when_token_is_missing(monkeypatch, tmp
     assert exc.value.code == 1
     assert 'GITHUB_TOKEN' in capsys.readouterr().err
     assert not (tmp_path / 'data').exists()
+
+
+def test_blank_token_env_var_is_treated_as_missing(monkeypatch, tmp_path, capsys):
+    monkeypatch.setenv('GITHUB_TOKEN', '   ')
+    importlib.reload(CollectFiles)
+    monkeypatch.chdir(tmp_path)
+
+    with pytest.raises(SystemExit) as exc:
+        CollectFiles.main()
+
+    assert exc.value.code == 1
+    assert 'GITHUB_TOKEN' in capsys.readouterr().err
 
 
 def test_main_handles_repo_with_no_files(monkeypatch, tmp_path, capsys):
@@ -108,3 +179,36 @@ def test_main_writes_csv_with_counts(monkeypatch, tmp_path, capsys):
     assert rows[0] == ['Filename', 'Touches']
     assert sorted(rows[1:]) == [['x.java', '2'], ['y.java', '1']]
     assert 'The file x.java has been touched 2 times.' in capsys.readouterr().out
+
+
+def test_failure_after_earlier_success_exits_and_writes_no_csv(monkeypatch, tmp_path, capsys):
+    monkeypatch.setattr(CollectFiles, 'GITHUB_TOKEN', 'test-token')
+    monkeypatch.chdir(tmp_path)
+    # Commit list and first commit succeed; the second commit's details time out
+    fake_get_sequence(monkeypatch, [
+        FakeResponse(body=json.dumps([{'sha': 'a'}]).encode()),
+        FakeResponse(body=json.dumps({'files': [{'filename': 'x.java'}]}).encode()),
+        requests.Timeout('slow'),
+    ])
+
+    with pytest.raises(SystemExit) as exc:
+        CollectFiles.main()
+
+    assert exc.value.code == 1
+    assert 'timed out' in capsys.readouterr().err
+    assert not (tmp_path / 'data').exists()
+
+
+def test_failure_does_not_overwrite_existing_csv(monkeypatch, tmp_path, capsys):
+    monkeypatch.setattr(CollectFiles, 'GITHUB_TOKEN', 'test-token')
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / 'data').mkdir()
+    csv_path = tmp_path / 'data' / 'file_rootbeer.csv'
+    csv_path.write_text('Filename,Touches\nold.java,9\n')
+    fake_get_sequence(monkeypatch, [FakeResponse(status_code=401)])
+
+    with pytest.raises(SystemExit) as exc:
+        CollectFiles.main()
+
+    assert exc.value.code == 1
+    assert csv_path.read_text() == 'Filename,Touches\nold.java,9\n'
