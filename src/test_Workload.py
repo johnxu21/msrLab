@@ -12,6 +12,13 @@ NOTEBOOK = os.path.join(SRC_DIR, 'Workload.ipynb')
 PR_LIST_URL = 'https://api.github.com/repos/example/repo/pulls?page=1&per_page=100&state=closed'
 PR_LIST_PAGE_2 = 'https://api.github.com/repos/example/repo/pulls?page=2&per_page=100&state=closed'
 ISSUE_LIST_URL = 'https://api.github.com/repos/example/repo/issues?page=1&per_page=100&state=all'
+ISSUE_LIST_PAGE_2 = 'https://api.github.com/repos/example/repo/issues?page=2&per_page=100&state=all'
+FILES_URL = 'https://api.github.com/repos/example/repo/pulls/1/files?per_page=100'
+FILES_PAGE_2 = FILES_URL + '&page=2'
+REVIEWS_URL = 'https://api.github.com/repos/example/repo/pulls/1/reviews?per_page=100'
+REVIEWS_PAGE_2 = REVIEWS_URL + '&page=2'
+COMMENTS_URL = 'https://api.github.com/repos/example/repo/issues/10/comments?per_page=100'
+COMMENTS_PAGE_2 = COMMENTS_URL + '&page=2'
 
 
 class FakeResponse:
@@ -34,9 +41,11 @@ def cell_containing(text):
     return matches[0]
 
 
-def fake_requests(monkeypatch, responses):
+def fake_requests(monkeypatch, responses, requested):
     # Each URL maps to JSON data, a FakeResponse, or an exception to raise. Unlisted URLs get an empty list.
+    # Every requested URL is appended to requested, in order.
     def fake_get(url, headers, timeout):
+        requested.append(url)
         outcome = responses.get(url, [])
         if isinstance(outcome, Exception):
             raise outcome
@@ -47,11 +56,11 @@ def fake_requests(monkeypatch, responses):
     monkeypatch.setattr(CollectFiles.requests, 'get', fake_get)
 
 
-def notebook_namespace(monkeypatch, responses, token='test-token'):
+def notebook_namespace(monkeypatch, responses, token='test-token', requested=None):
     # Run the notebook's setup cells in a fresh namespace, with requests.get faked
     monkeypatch.setattr(CollectFiles, 'GITHUB_TOKEN', token)
     monkeypatch.chdir(SRC_DIR)
-    fake_requests(monkeypatch, responses)
+    fake_requests(monkeypatch, responses, [] if requested is None else requested)
     ns = {}
     exec(cell_containing('import pandas'), ns)
     exec(cell_containing('ignore_date = '), ns)
@@ -98,12 +107,22 @@ def merged_pr(number, author):
     return {'number': number, 'user': user(author), 'merged_at': '2024-03-01T00:00:00Z'}
 
 
+def page(items, next_url=None):
+    # One page of a list endpoint. next_url goes in the Link header, as GitHub sends it.
+    links = {'next': {'url': next_url}} if next_url else {}
+    return FakeResponse(body=json.dumps(items).encode(), links=links)
+
+
+def files_entry(filename, changes=10):
+    return {'filename': filename, 'changes': changes}
+
+
 def pr_responses(prs, reviews=None):
     # Each PR changes one Java file. reviews maps a PR number to its review list.
     responses = {PR_LIST_URL: prs}
     for pr in prs:
         number = pr['number']
-        responses['https://api.github.com/repos/example/repo/pulls/{}/files'.format(number)] = [
+        responses['https://api.github.com/repos/example/repo/pulls/{}/files?per_page=100'.format(number)] = [
             {'filename': 'src/Main.java', 'changes': 10},
         ]
     for number, review_list in (reviews or {}).items():
@@ -132,7 +151,7 @@ def test_duplicate_first_names_stay_separate_for_pull_requests(monkeypatch):
 def test_duplicate_first_names_stay_separate_for_issues_and_comments(monkeypatch):
     responses = {
         ISSUE_LIST_URL: [issue(10, 'alice-jones')],
-        'https://api.github.com/repos/example/repo/issues/10/comments': [{'user': user('alice-smith')}],
+        COMMENTS_URL: [{'user': user('alice-smith')}],
     }
     ns = notebook_namespace(monkeypatch, responses)
 
@@ -198,7 +217,7 @@ def test_missing_issue_author_still_credits_identifiable_commenters(monkeypatch)
     # The issue's author was deleted, so its issue count is skipped, but the commenter is still credited
     responses = {
         ISSUE_LIST_URL: [issue(10, None)],
-        'https://api.github.com/repos/example/repo/issues/10/comments': [{'user': user('erin')}],
+        COMMENTS_URL: [{'user': user('erin')}],
     }
     ns = notebook_namespace(monkeypatch, responses)
 
@@ -213,7 +232,7 @@ def test_review_only_and_comment_only_participants_are_separate_rows_by_login(mo
     prs = [merged_pr(1, 'alice')]
     responses = pr_responses(prs, {1: [{'user': user('dan')}]})
     responses[ISSUE_LIST_URL] = [issue(10, 'alice')]
-    responses['https://api.github.com/repos/example/repo/issues/10/comments'] = [{'user': user('erin')}]
+    responses[COMMENTS_URL] = [{'user': user('erin')}]
 
     ns = run_dataframe_join(monkeypatch, responses)
     df = ns['df_merged'].set_index('Login')
@@ -259,7 +278,7 @@ def test_missing_token_clears_populated_results_before_failing(monkeypatch, toke
     assert 'df_merged' in ns and 'contributor_pr_count' in ns
 
     monkeypatch.setattr(CollectFiles, 'GITHUB_TOKEN', token)
-    fake_requests(monkeypatch, {})
+    fake_requests(monkeypatch, {}, [])
 
     with pytest.raises(CollectFiles.GitHubError, match='GITHUB_TOKEN'):
         run_pr(ns)
@@ -275,7 +294,7 @@ def test_failed_pr_rerun_clears_pr_results_and_joined_table_only(monkeypatch):
     run_collection(ns)
     build_tables(ns)
 
-    fake_requests(monkeypatch, {PR_LIST_URL: FakeResponse(status_code=500)})
+    fake_requests(monkeypatch, {PR_LIST_URL: FakeResponse(status_code=500)}, [])
     with pytest.raises(CollectFiles.GitHubError):
         run_pr(ns)
 
@@ -292,7 +311,7 @@ def test_failed_issue_rerun_clears_issue_results_and_joined_table_only(monkeypat
     run_collection(ns)
     build_tables(ns)
 
-    fake_requests(monkeypatch, {ISSUE_LIST_URL: FakeResponse(status_code=500)})
+    fake_requests(monkeypatch, {ISSUE_LIST_URL: FakeResponse(status_code=500)}, [])
     with pytest.raises(CollectFiles.GitHubError):
         run_issues(ns)
 
@@ -311,3 +330,170 @@ def test_error_messages_never_show_the_token(monkeypatch, capsys):
     output = capsys.readouterr()
     assert 'secret-token-value' not in str(exc.value)
     assert 'secret-token-value' not in output.out + output.err
+
+
+def files_at_limit(start, count):
+    return [files_entry('src/File{}.java'.format(i), changes=1) for i in range(start, start + count)]
+
+
+def test_pr_files_on_a_later_page_are_counted(monkeypatch):
+    # Page 1 holds only ignored extensions, so the counted file exists only on page 2
+    first_page = [files_entry('docs/notes{}.json'.format(i)) for i in range(30)]
+    responses = {
+        PR_LIST_URL: [merged_pr(1, 'alice')],
+        FILES_URL: page(first_page, FILES_PAGE_2),
+        FILES_PAGE_2: page([files_entry('src/Main.java', changes=7)]),
+    }
+    requested = []
+    ns = notebook_namespace(monkeypatch, responses, requested=requested)
+
+    run_pr(ns)
+
+    assert ns['contributor_changedFiles_count'] == {'alice': 1}
+    assert ns['contributor_changedLOC'] == {'alice': 7}
+    assert requested == [PR_LIST_URL, FILES_URL, FILES_PAGE_2, REVIEWS_URL, PR_LIST_PAGE_2]
+
+
+def test_reviews_span_pages_and_each_reviewer_is_counted_once(monkeypatch):
+    responses = pr_responses([merged_pr(1, 'alice')])
+    responses[REVIEWS_URL] = page([{'user': user('dan')}, {'user': user('erin')}], REVIEWS_PAGE_2)
+    responses[REVIEWS_PAGE_2] = page([
+        {'user': user('dan')},
+        {'user': user('alice')},
+        {'user': user('frank')},
+    ])
+    requested = []
+    ns = notebook_namespace(monkeypatch, responses, requested=requested)
+
+    run_pr(ns)
+
+    # dan reviewed on both pages, and alice's own review on page 2 is excluded
+    assert ns['contributor_pr_review_count'] == {'dan': 1, 'erin': 1, 'frank': 1}
+    assert requested == [PR_LIST_URL, FILES_URL, REVIEWS_URL, REVIEWS_PAGE_2, PR_LIST_PAGE_2]
+
+
+def test_issue_comments_span_pages(monkeypatch):
+    responses = {
+        ISSUE_LIST_URL: [issue(10, 'alice')],
+        COMMENTS_URL: page([{'user': user('erin')}], COMMENTS_PAGE_2),
+        COMMENTS_PAGE_2: page([{'user': user('dan')}]),
+    }
+    requested = []
+    ns = notebook_namespace(monkeypatch, responses, requested=requested)
+
+    run_issues(ns)
+
+    assert ns['contributor_comment_count'] == {'erin': 1, 'dan': 1}
+    assert requested == [ISSUE_LIST_URL, COMMENTS_URL, COMMENTS_PAGE_2, ISSUE_LIST_PAGE_2]
+
+
+def test_pr_files_below_the_cap_across_pages_are_complete(monkeypatch):
+    responses = {
+        PR_LIST_URL: [merged_pr(1, 'alice')],
+        FILES_URL: page(files_at_limit(0, 2000), FILES_PAGE_2),
+        FILES_PAGE_2: page(files_at_limit(2000, 999)),
+    }
+    requested = []
+    ns = notebook_namespace(monkeypatch, responses, requested=requested)
+
+    run_pr(ns)
+
+    assert ns['contributor_changedFiles_count'] == {'alice': 2999}
+    assert ns['contributor_changedLOC'] == {'alice': 2999}
+    assert requested == [PR_LIST_URL, FILES_URL, FILES_PAGE_2, REVIEWS_URL, PR_LIST_PAGE_2]
+
+
+def test_pr_files_reaching_the_cap_on_the_last_page_raise(monkeypatch):
+    responses = {PR_LIST_URL: [merged_pr(1, 'alice')], FILES_URL: page(files_at_limit(0, 3000))}
+    requested = []
+    ns = notebook_namespace(monkeypatch, responses, requested=requested)
+
+    with pytest.raises(CollectFiles.GitHubError, match='cannot be established'):
+        run_pr(ns)
+
+    # The cap stops collection at the page that reaches it, before reviews are requested
+    assert requested == [PR_LIST_URL, FILES_URL]
+    assert 'contributor_pr_count' not in ns
+
+
+def test_pr_files_reaching_the_cap_with_a_next_link_raise_without_fetching_it(monkeypatch):
+    responses = {
+        PR_LIST_URL: [merged_pr(1, 'alice')],
+        FILES_URL: page(files_at_limit(0, 3000), FILES_PAGE_2),
+        FILES_PAGE_2: page([files_entry('src/Late.java')]),
+    }
+    requested = []
+    ns = notebook_namespace(monkeypatch, responses, requested=requested)
+
+    with pytest.raises(CollectFiles.GitHubError, match='cannot be established'):
+        run_pr(ns)
+
+    assert requested == [PR_LIST_URL, FILES_URL]
+    assert 'contributor_pr_count' not in ns
+
+
+def test_failure_on_a_later_files_page_after_progress_stores_nothing(monkeypatch):
+    responses = {
+        PR_LIST_URL: [merged_pr(1, 'alice')],
+        FILES_URL: page([files_entry('src/Main.java')], FILES_PAGE_2),
+        FILES_PAGE_2: FakeResponse(status_code=500),
+    }
+    ns = notebook_namespace(monkeypatch, responses)
+
+    with pytest.raises(CollectFiles.GitHubError):
+        run_pr(ns)
+
+    assert 'contributor_pr_count' not in ns
+    assert 'contributor_changedFiles_count' not in ns
+
+
+def test_failed_pr_rerun_on_a_later_files_page_clears_dependent_tables(monkeypatch):
+    # An earlier successful run, with PR files paged, builds every table
+    responses = {
+        PR_LIST_URL: [merged_pr(1, 'alice')],
+        FILES_URL: page([files_entry('src/Main.java')], FILES_PAGE_2),
+        FILES_PAGE_2: page([files_entry('src/Other.java')]),
+        ISSUE_LIST_URL: [issue(10, 'erin')],
+        COMMENTS_URL: [{'user': user('dan')}],
+    }
+    ns = run_dataframe_join(monkeypatch, responses)
+    assert ns['df_merged'].shape[0] > 0
+
+    # The PR-only rerun fails on page 2 of the files, after page 1 has been read
+    fake_requests(monkeypatch, {
+        PR_LIST_URL: [merged_pr(1, 'alice')],
+        FILES_URL: page([files_entry('src/Main.java')], FILES_PAGE_2),
+        FILES_PAGE_2: FakeResponse(status_code=500),
+    }, [])
+    with pytest.raises(CollectFiles.GitHubError):
+        run_pr(ns)
+
+    for name in ('contributor_pr_count', 'contributor_changedFiles_count', 'df_pr', 'df_pr_ChangedFiles', 'df_list', 'df_merged'):
+        assert name not in ns
+    # The issue step did not run, so its tables are still from the successful run
+    assert ns['df_issues'].shape[0] == 1
+
+
+def test_failed_issue_rerun_on_a_later_comment_page_clears_dependent_tables(monkeypatch):
+    responses = {
+        PR_LIST_URL: [merged_pr(1, 'alice')],
+        ISSUE_LIST_URL: [issue(10, 'erin')],
+        COMMENTS_URL: page([{'user': user('dan')}], COMMENTS_PAGE_2),
+        COMMENTS_PAGE_2: page([{'user': user('frank')}]),
+    }
+    ns = run_dataframe_join(monkeypatch, responses)
+    assert ns['df_issues_comments'].shape[0] == 2
+
+    # The issue-only rerun fails on page 2 of the comments, after page 1 has been read
+    fake_requests(monkeypatch, {
+        ISSUE_LIST_URL: [issue(10, 'erin')],
+        COMMENTS_URL: page([{'user': user('dan')}], COMMENTS_PAGE_2),
+        COMMENTS_PAGE_2: FakeResponse(status_code=500),
+    }, [])
+    with pytest.raises(CollectFiles.GitHubError):
+        run_issues(ns)
+
+    for name in ('contributor_issue_count', 'contributor_comment_count', 'df_issues', 'df_issues_comments', 'df_list', 'df_merged'):
+        assert name not in ns
+    # The PR step did not run, so its tables are still from the successful run
+    assert ns['df_pr'].shape[0] == 1
