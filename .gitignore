@@ -1,0 +1,12 @@
+# macOS metadata
+.DS_Store
+
+# Jupyter autosave copies
+.ipynb_checkpoints/
+
+# Python bytecode and caches
+__pycache__/
+*.pyc
+
+# IDE project settings
+.idea/
