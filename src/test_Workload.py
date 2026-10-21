@@ -336,6 +336,26 @@ def files_at_limit(start, count):
     return [files_entry('src/File{}.java'.format(i), changes=1) for i in range(start, start + count)]
 
 
+def files_page_url(number):
+    return FILES_URL if number == 1 else '{}&page={}'.format(FILES_URL, number)
+
+
+def paged_files(total, final_next=None):
+    # PR files in pages of at most 100 entries, each page at its own URL. Every page links to the next one,
+    # and the last page links to final_next (None means no next link).
+    starts = range(0, total, 100)
+    responses = {}
+    for number, start in enumerate(starts, start=1):
+        count = min(100, total - start)
+        next_url = files_page_url(number + 1) if start + count < total else final_next
+        responses[files_page_url(number)] = page(files_at_limit(start, count), next_url)
+    return responses
+
+
+def files_request_sequence(pages):
+    return [files_page_url(number) for number in range(1, pages + 1)]
+
+
 def test_pr_files_on_a_later_page_are_counted(monkeypatch):
     # Page 1 holds only ignored extensions, so the counted file exists only on page 2
     first_page = [files_entry('docs/notes{}.json'.format(i)) for i in range(30)]
@@ -387,12 +407,9 @@ def test_issue_comments_span_pages(monkeypatch):
     assert requested == [ISSUE_LIST_URL, COMMENTS_URL, COMMENTS_PAGE_2, ISSUE_LIST_PAGE_2]
 
 
-def test_pr_files_below_the_cap_across_pages_are_complete(monkeypatch):
-    responses = {
-        PR_LIST_URL: [merged_pr(1, 'alice')],
-        FILES_URL: page(files_at_limit(0, 2000), FILES_PAGE_2),
-        FILES_PAGE_2: page(files_at_limit(2000, 999)),
-    }
+def test_pr_files_below_the_cap_across_30_pages_are_complete(monkeypatch):
+    # 2,999 entries in 30 pages of at most 100 each
+    responses = {PR_LIST_URL: [merged_pr(1, 'alice')], **paged_files(2999)}
     requested = []
     ns = notebook_namespace(monkeypatch, responses, requested=requested)
 
@@ -400,35 +417,34 @@ def test_pr_files_below_the_cap_across_pages_are_complete(monkeypatch):
 
     assert ns['contributor_changedFiles_count'] == {'alice': 2999}
     assert ns['contributor_changedLOC'] == {'alice': 2999}
-    assert requested == [PR_LIST_URL, FILES_URL, FILES_PAGE_2, REVIEWS_URL, PR_LIST_PAGE_2]
+    assert requested == [PR_LIST_URL] + files_request_sequence(30) + [REVIEWS_URL, PR_LIST_PAGE_2]
 
 
-def test_pr_files_reaching_the_cap_on_the_last_page_raise(monkeypatch):
-    responses = {PR_LIST_URL: [merged_pr(1, 'alice')], FILES_URL: page(files_at_limit(0, 3000))}
+def test_pr_files_at_the_cap_on_the_final_page_without_a_next_link_raise(monkeypatch):
+    # 3,000 entries in 30 pages, and the last page has no next link
+    responses = {PR_LIST_URL: [merged_pr(1, 'alice')], **paged_files(3000)}
     requested = []
     ns = notebook_namespace(monkeypatch, responses, requested=requested)
 
     with pytest.raises(CollectFiles.GitHubError, match='cannot be established'):
         run_pr(ns)
 
-    # The cap stops collection at the page that reaches it, before reviews are requested
-    assert requested == [PR_LIST_URL, FILES_URL]
+    # Collection stops at page 30, which reaches the cap. Reviews are not requested.
+    assert requested == [PR_LIST_URL] + files_request_sequence(30)
     assert 'contributor_pr_count' not in ns
 
 
-def test_pr_files_reaching_the_cap_with_a_next_link_raise_without_fetching_it(monkeypatch):
-    responses = {
-        PR_LIST_URL: [merged_pr(1, 'alice')],
-        FILES_URL: page(files_at_limit(0, 3000), FILES_PAGE_2),
-        FILES_PAGE_2: page([files_entry('src/Late.java')]),
-    }
+def test_pr_files_at_the_cap_with_a_final_next_link_raise_without_fetching_it(monkeypatch):
+    # 3,000 entries in 30 pages, and the last page links to a 31st page that must not be requested
+    responses = {PR_LIST_URL: [merged_pr(1, 'alice')], **paged_files(3000, final_next=files_page_url(31))}
+    responses[files_page_url(31)] = page([files_entry('src/Late.java')])
     requested = []
     ns = notebook_namespace(monkeypatch, responses, requested=requested)
 
     with pytest.raises(CollectFiles.GitHubError, match='cannot be established'):
         run_pr(ns)
 
-    assert requested == [PR_LIST_URL, FILES_URL]
+    assert requested == [PR_LIST_URL] + files_request_sequence(30)
     assert 'contributor_pr_count' not in ns
 
 
