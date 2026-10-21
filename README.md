@@ -3,7 +3,8 @@ In this repo you will find the course content for lab Mining Repositories
 
 ## Requirements
 
-- Tested: Python 3.11 and Python 3.14, with the pinned packages.
+- Python 3.11: fully tested. The pinned packages install, all 41 tests pass, and the notebook, Jupyter launch, and kernel check were run.
+- Python 3.14: installation and import verification only. The pinned packages install and import, but the test suite was not run on 3.14.
 - Not tested: every other Python version. Python 3.9 cannot install the pinned packages.
 - A GitHub personal access token. Creating one is covered below.
 
@@ -46,20 +47,35 @@ The tests mock every GitHub request, so they need no network access. Run them fr
 pytest -v
 ```
 
+## Configure the notebook
+
+Before Run All, open the configuration cell at the top of `Workload.ipynb` (the cell that sets `reponame` and `ignore_date`) and set:
+
+- `reponame` to the repository you want to analyze, written as `owner/repository`, for example `"johnxu21/msrLab"`. The default is blank, so the first collection cell fails until you set it.
+- `ignore_date` is the cutoff for collection. Pull requests are counted only if they were merged after this date, and issues only if they were created after it. Reviews and comments are not filtered by their own timestamps. They are counted for the pull requests and issues that pass the cutoff. The cutoff is the only timestamp filter in the notebook.
+
 ## Running the notebook
 
-From `src/`, with the environment active and `GITHUB_TOKEN` set:
+Start Jupyter from `src/`, with the environment active and `GITHUB_TOKEN` set:
 
 ```
 jupyter notebook Workload.ipynb
 ```
 
-The notebook asks for the kernel named `python3`, which the venv provides as "Python 3 (ipykernel)". Before running, check that the kernel uses the venv. In a new cell, which you can delete afterward, run:
+The notebook's kernel is named `python3`. The venv provides it as "Python 3 (ipykernel)", but that label is not reliable on a machine that has other Python kernels. Register the venv under a unique name instead, once, with the venv active:
+
+```
+python -m ipykernel install --user --name msrlab-venv --display-name "msrLab (venv)"
+```
+
+In the notebook, choose **Kernel > Change Kernel > msrLab (venv)**. Then check which interpreter the kernel runs. In a new cell, which you can delete afterward, run:
 
 ```
 import sys; print(sys.executable)
 ```
 
-The path should contain `venvs/msrlab/bin/python`. If it does not, choose **Kernel > Change Kernel > Python 3 (ipykernel)** and run the check again.
+The path must contain `venvs/msrlab/bin/python`. If it does not, the kernel is wrong. Choose **msrLab (venv)** again, and check once more before continuing.
+
+Changing the kernel does not change the notebook's cells or outputs. Saving the notebook may record the new kernel name in its metadata.
 
 Then choose **Run All**. The notebook calls the live GitHub API, so it needs network access and a valid token. Rerunning a single collection cell is covered in the notebook's markdown.
