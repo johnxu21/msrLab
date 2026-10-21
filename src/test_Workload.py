@@ -5,6 +5,9 @@ import pandas as pd
 import pytest
 import requests
 
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 import CollectFiles
 
 SRC_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -85,11 +88,27 @@ def run_collection(ns):
 
 
 def build_tables(ns):
-    # Run the DataFrame construction and the join, stopping before the plotting-selection filters (head and sort)
+    # Run the DataFrame construction and the join cell, which includes the ordering and the empty-table message
     exec(cell_containing('df_pr = pd.DataFrame'), ns)
-    join_code = cell_containing('df_list = [')
-    before_filters, _ = join_code.split('df_merged = df_merged.fillna(0)')
-    exec(before_filters, ns)
+    exec(cell_containing('df_list = ['), ns)
+
+
+PLOT_CELL_MARKERS = ('y=["PRs", "PR_Reviews"', 'y=["Changed_Files"]', 'y=["Changed_LOC"]')
+
+
+def run_plot_cell(ns, marker):
+    # Runs one plotting cell and returns the axes it created, or None if the cell skipped the chart
+    ns.pop('ax', None)
+    exec(cell_containing(marker), ns)
+    return ns.get('ax')
+
+
+@pytest.fixture(autouse=True)
+def no_plot_windows(monkeypatch):
+    # Charts are drawn on the Agg backend, and figures are closed after each test
+    monkeypatch.setattr(plt, 'show', lambda: None)
+    yield
+    plt.close('all')
 
 
 def run_dataframe_join(monkeypatch, responses):
@@ -239,9 +258,9 @@ def test_review_only_and_comment_only_participants_are_separate_rows_by_login(mo
 
     assert sorted(df.index) == ['alice', 'dan', 'erin']
     assert df.loc['alice', 'PRs'] == 1 and df.loc['alice', 'Issues'] == 1
-    # Review-only and comment-only rows have no count for the other activity; they are not merged into another row
-    assert df.loc['dan', 'PR_Reviews'] == 1 and pd.isna(df.loc['dan', 'PRs'])
-    assert df.loc['erin', 'Issue_Comments'] == 1 and pd.isna(df.loc['erin', 'PRs'])
+    # Review-only and comment-only rows have a zero count for the other activity; they are not merged into another row
+    assert df.loc['dan', 'PR_Reviews'] == 1 and df.loc['dan', 'PRs'] == 0
+    assert df.loc['erin', 'Issue_Comments'] == 1 and df.loc['erin', 'PRs'] == 0
 
 
 @pytest.mark.parametrize('failure', [
@@ -547,3 +566,76 @@ def test_issue_counts_only_when_created_after_the_cutoff(monkeypatch, created_at
     run_issues(ns)
 
     assert ns['contributor_issue_count'] == ({'alice': 1} if counted else {})
+
+
+def test_every_participant_appears_in_lowercase_login_order_with_review_and_comment_only_rows(monkeypatch):
+    authors = ['Zed', 'alice', 'Bob', 'carol'] + ['user{:02d}'.format(i) for i in range(30)]
+    prs = [merged_pr(number, login) for number, login in enumerate(authors, start=1)]
+    responses = pr_responses(prs, {1: [{'user': user('reviewer_only')}]})
+    responses[ISSUE_LIST_URL] = [issue(10, 'carol')]
+    responses[COMMENTS_URL] = [{'user': user('commenter_only')}]
+    ns = run_dataframe_join(monkeypatch, responses)
+
+    expected = sorted(authors + ['reviewer_only', 'commenter_only'], key=lambda login: (login.lower(), login))
+    df = ns['df_merged']
+    assert df['Login'].tolist() == expected
+    assert len(expected) == 36
+    for column in ('PRs', 'PR_Reviews', 'Issues', 'Issue_Comments', 'Changed_Files', 'Changed_LOC'):
+        assert pd.api.types.is_integer_dtype(df[column]), column
+
+
+def test_participant_table_and_chart_bars_match_the_collected_counts(monkeypatch):
+    authors = ['Zed', 'alice', 'Bob', 'carol'] + ['user{:02d}'.format(i) for i in range(30)]
+    prs = [merged_pr(number, login) for number, login in enumerate(authors, start=1)]
+    responses = pr_responses(prs, {1: [{'user': user('reviewer_only')}]})
+    responses[ISSUE_LIST_URL] = [issue(10, 'carol')]
+    responses[COMMENTS_URL] = [{'user': user('commenter_only')}]
+    ns = run_dataframe_join(monkeypatch, responses)
+    logins = ns['df_merged']['Login'].tolist()
+    n = len(logins)
+
+    # Every participant gets one bar per series, and each PR author's changed file has 10 lines
+    contributions = run_plot_cell(ns, 'y=["PRs", "PR_Reviews"')
+    assert [t.get_text() for t in contributions.get_xticklabels()] == logins
+    assert contributions.get_xlabel() == 'GitHub login'
+    assert contributions.get_ylabel() == 'Count (PRs, PR reviews, issues, issue comments)'
+    assert contributions.get_legend_handles_labels()[1] == ['PRs', 'PR_Reviews', 'Issues', 'Issue_Comments']
+    heights = [p.get_height() for p in contributions.patches]
+    assert len(heights) == 4 * n
+    # Pandas draws each series in turn, so each block of n bars matches one column of the table
+    for index, column in enumerate(['PRs', 'PR_Reviews', 'Issues', 'Issue_Comments']):
+        assert heights[index * n:(index + 1) * n] == ns['df_merged'][column].tolist(), column
+
+    file_changes = run_plot_cell(ns, 'y=["Changed_Files"]')
+    assert [t.get_text() for t in file_changes.get_xticklabels()] == logins
+    assert file_changes.get_ylabel() == 'File changes across authored PRs'
+    assert [p.get_height() for p in file_changes.patches] == [0 if login in ('reviewer_only', 'commenter_only') else 1 for login in logins]
+
+    lines = run_plot_cell(ns, 'y=["Changed_LOC"]')
+    assert [t.get_text() for t in lines.get_xticklabels()] == logins
+    assert lines.get_ylabel() == 'Lines added + deleted across authored PRs'
+    assert [p.get_height() for p in lines.patches] == [0 if login in ('reviewer_only', 'commenter_only') else 10 for login in logins]
+
+
+def test_empty_results_print_one_message_and_every_plot_cell_skips(monkeypatch, capsys):
+    ns = run_dataframe_join(monkeypatch, {})
+
+    assert ns['df_merged'].empty
+    assert capsys.readouterr().out.count('No participants were collected') == 1
+    for marker in PLOT_CELL_MARKERS:
+        assert run_plot_cell(ns, marker) is None
+    assert plt.get_fignums() == []
+
+
+def test_join_and_plots_after_a_failed_collection_raise_instead_of_showing_an_empty_table(monkeypatch):
+    ns = run_dataframe_join(monkeypatch, pr_responses([merged_pr(1, 'alice')]))
+
+    fake_requests(monkeypatch, {PR_LIST_URL: FakeResponse(status_code=500)}, [])
+    with pytest.raises(CollectFiles.GitHubError):
+        run_pr(ns)
+
+    with pytest.raises(NameError):
+        build_tables(ns)
+    for marker in PLOT_CELL_MARKERS:
+        with pytest.raises(NameError):
+            run_plot_cell(ns, marker)
