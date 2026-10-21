@@ -103,8 +103,8 @@ def user(login):
     return None if login is None else {'login': login}
 
 
-def merged_pr(number, author):
-    return {'number': number, 'user': user(author), 'merged_at': '2024-03-01T00:00:00Z'}
+def merged_pr(number, author, merged_at='2024-03-01T00:00:00Z'):
+    return {'number': number, 'user': user(author), 'merged_at': merged_at}
 
 
 def page(items, next_url=None):
@@ -130,11 +130,11 @@ def pr_responses(prs, reviews=None):
     return responses
 
 
-def issue(number, author):
+def issue(number, author, created_at='2024-03-01T00:00:00Z'):
     return {
         'number': number,
         'user': user(author),
-        'created_at': '2024-03-01T00:00:00Z',
+        'created_at': created_at,
         'comments_url': 'https://api.github.com/repos/example/repo/issues/{}/comments'.format(number),
     }
 
@@ -513,3 +513,37 @@ def test_failed_issue_rerun_on_a_later_comment_page_clears_dependent_tables(monk
         assert name not in ns
     # The PR step did not run, so its tables are still from the successful run
     assert ns['df_pr'].shape[0] == 1
+
+
+# The notebook's ignore_date is 2023-02-16T00:00:00 UTC. A timestamp counts only when it is strictly after it.
+CUTOFF_CASES = [
+    pytest.param('2023-02-15T23:59:59Z', False, id='one-second-before'),
+    pytest.param('2023-02-16T00:00:00Z', False, id='exactly-at-cutoff'),
+    pytest.param('2023-02-16T00:00:01Z', True, id='one-second-after'),
+    pytest.param('2023-02-16T00:59:59Z', True, id='59-min-59-sec-after'),
+    pytest.param('2023-02-16T01:00:00Z', True, id='one-hour-after'),
+    pytest.param('2023-02-16T01:00:00+01:00', False, id='exact-cutoff-utc-plus-1'),
+    pytest.param('2023-02-16T01:00:01+01:00', True, id='one-second-after-utc-plus-1'),
+    pytest.param('2023-02-15T19:00:00-05:00', False, id='exact-cutoff-utc-minus-5'),
+    pytest.param('2023-02-15T19:00:01-05:00', True, id='one-second-after-utc-minus-5'),
+]
+
+
+@pytest.mark.parametrize('merged_at, counted', CUTOFF_CASES)
+def test_pull_request_counts_only_when_merged_after_the_cutoff(monkeypatch, merged_at, counted):
+    ns = notebook_namespace(monkeypatch, pr_responses([merged_pr(1, 'alice', merged_at)]))
+
+    run_pr(ns)
+
+    expected = {'alice': 1} if counted else {}
+    assert ns['contributor_pr_count'] == expected
+    assert ns['contributor_changedFiles_count'] == expected
+
+
+@pytest.mark.parametrize('created_at, counted', CUTOFF_CASES)
+def test_issue_counts_only_when_created_after_the_cutoff(monkeypatch, created_at, counted):
+    ns = notebook_namespace(monkeypatch, {ISSUE_LIST_URL: [issue(10, 'alice', created_at)]})
+
+    run_issues(ns)
+
+    assert ns['contributor_issue_count'] == ({'alice': 1} if counted else {})
